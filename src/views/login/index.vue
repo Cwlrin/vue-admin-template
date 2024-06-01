@@ -4,8 +4,8 @@
     <div class="form">
       <h1>登录</h1>
       <el-card shadow="never" class="login-card">
-        <!--  登录表单  -->
-        <!--  el-form > el-form-item el-input  -->
+        <!--登录表单-->
+        <!-- el-form > el-form-item > el-input -->
         <el-form ref="form" :model="loginForm" :rules="loginRules">
           <el-form-item prop="mobile">
             <el-input v-model="loginForm.mobile" placeholder="请输入手机号" />
@@ -19,9 +19,7 @@
             </el-checkbox>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" style="width: 350px;" @click="login">
-              登录
-            </el-button>
+            <el-button style="width:350px" type="primary" @click="login">登录</el-button>
           </el-form-item>
         </el-form>
       </el-card>
@@ -34,9 +32,9 @@ export default {
   data() {
     return {
       loginForm: {
-        mobile: '',
-        password: '',
-        isAgree: false
+        mobile: process.env.NODE_ENV === 'development' ? '13812345678' : '',
+        password: process.env.NODE_ENV === 'development' ? 'hm#qd@23!' : '',
+        isAgree: process.env.NODE_ENV === 'development'
       },
       loginRules: {
         mobile: [{
@@ -45,7 +43,8 @@ export default {
           trigger: 'blur'
         }, {
           pattern: /^1[3-9]\d{9}$/,
-          message: '手机号格式不正确'
+          message: '手机号格式不正确',
+          trigger: 'blur'
         }],
         password: [{
           required: true,
@@ -54,16 +53,17 @@ export default {
         }, {
           min: 6,
           max: 16,
-          message: '密码长度应该为 6-16 位之间'
+          message: '密码长度应该为6-16位之间',
+          trigger: 'blur'
         }],
-        // required 只能检测 null undefined ""
+        // required只能检测 null undefined ""
         isAgree: [{
           validator: (rule, value, callback) => {
-            // rule 校验规则
+            // rule校验规则
             // value 校验的值
             // callback 函数 - promise resolve reject
             // callback() callback(new Error(错误信息))
-            value ? callback() : callback(new Error('您必须勾选用户平台使用协议'))
+            value ? callback() : callback(new Error('您必须勾选用户的使用协议'))
           }
         }]
       }
