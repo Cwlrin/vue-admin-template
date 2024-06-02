@@ -21,20 +21,25 @@
               首页
             </el-dropdown-item>
           </router-link>
-          <a target="_blank" href="https://github.com/Cwlrin/vue-admin-template/">
+          <a target="_blank" href="https://github.com/PanJiaChen/vue-admin-template/">
             <el-dropdown-item>项目地址</el-dropdown-item>
           </a>
           <!-- prevent阻止默认事件 -->
           <a target="_blank" @click.prevent="updatePassword">
             <el-dropdown-item>修改密码</el-dropdown-item>
           </a>
+          <!-- native事件修饰符 -->
+          <!-- 注册组件的根元素的原生事件 -->
           <el-dropdown-item @click.native="logout">
             <span style="display:block;">登出</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
-    <el-dialog :visible.sync="showDialog" width="500px" title="修改密码" @close="btnCancel">
+    <!-- 放置dialog -->
+    <!-- sync- 可以接收子组件传过来的事件和值 -->
+    <el-dialog width="500px" title="修改密码" :visible.sync="showDialog" @close="btnCancel">
+      <!-- 放置表单 -->
       <el-form ref="passForm" label-width="120px" :model="passForm" :rules="rules">
         <el-form-item label="旧密码" prop="oldPassword">
           <el-input v-model="passForm.oldPassword" show-password size="small" />
@@ -46,8 +51,8 @@
           <el-input v-model="passForm.confirmPassword" show-password size="small" />
         </el-form-item>
         <el-form-item>
-          <el-button size="mini" type="primary" >确认修改</el-button>
-          <el-button size="mini">取消</el-button>
+          <el-button size="mini" type="primary" @click="btnOK">确认修改</el-button>
+          <el-button size="mini" @click="btnCancel">取消</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -67,7 +72,7 @@ export default {
   },
   data() {
     return {
-      showDialog: false,
+      showDialog: false, // 控制弹层的显示和隐藏
       passForm: {
         oldPassword: '', // 旧密码
         newPassword: '', // 新密码
@@ -105,12 +110,14 @@ export default {
   },
   methods: {
     updatePassword() {
-      this.showDialog = true
+      // 弹出层
+      this.showDialog = true // 显示弹层
     },
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
     async logout() {
+      // 调用退出登录的action
       await this.$store.dispatch('user/logout')
       this.$router.push('/login')
     },
@@ -125,6 +132,7 @@ export default {
         }
       })
     },
+    // 取消
     btnCancel() {
       this.$refs.passForm.resetFields() // 重置表单
       // 关闭弹层
@@ -194,13 +202,11 @@ export default {
         position: relative;
         display: flex;
         align-items: center;
-
         .name {
           //  用户名称距离右侧距离
           margin-right: 10px;
           font-size: 16px;
         }
-
         .username {
           width: 30px;
           height: 30px;
@@ -211,11 +217,9 @@ export default {
           color: #fff;
           margin-right: 4px;
         }
-
         .el-icon-setting {
           font-size: 20px;
         }
-
         .user-avatar {
           cursor: pointer;
           width: 30px;

@@ -1,9 +1,8 @@
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import { getUserInfo, login } from '@/api/user'
-
+import { login, getUserInfo } from '@/api/user'
 const state = {
   token: getToken(), // 从缓存中读取初始值
-  userInfo: {} // 这里有一个空对象，为了放置后面取数据报错
+  userInfo: {} // 存储用户基本资料状态
 }
 
 const mutations = {
@@ -12,7 +11,7 @@ const mutations = {
     // 同步到缓存
     setToken(token)
   },
-  removeToken() {
+  removeToken(state) {
     // 删除Vuex的token
     state.token = null
     removeToken()

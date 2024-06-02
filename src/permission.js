@@ -21,9 +21,9 @@ router.beforeEach(async(to, from, next) => {
     } else {
       // 判断是否获取过资料
       if (!store.getters.userId) {
-        await store.diapatch('user/getUserInfo')
+        await store.dispatch('user/getUserInfo')
       }
-      next() // 放行
+      next() // 放过
     }
   } else {
     // 没有token
@@ -36,3 +36,10 @@ router.beforeEach(async(to, from, next) => {
   }
 })
 
+/** *
+ * 后置守卫
+ * **/
+router.afterEach(() => {
+  console.log('123')
+  nprogress.done()
+})

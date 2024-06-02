@@ -40,7 +40,7 @@ service.interceptors.response.use((response) => {
     return Promise.reject(error)
   }
   // error.message
-  Message.error(error.message)
+  Message({ type: 'error', message: error.message })
   return Promise.reject(error)
 })
 export default service
