@@ -6,10 +6,10 @@ import store from '@/store'
 /**
  *前置守卫
  *
-*/
+ */
 
 const whiteList = ['/login', '/404']
-router.beforeEach((to, from, next) => {
+router.beforeEach(async(to, from, next) => {
   nprogress.start()
   if (store.getters.token) {
     // 存在token
@@ -19,7 +19,11 @@ router.beforeEach((to, from, next) => {
       // next（地址）并没有执行后置守卫
       nprogress.done()
     } else {
-      next() // 放过
+      // 判断是否获取过资料
+      if (!store.getters.userId) {
+        await store.diapatch('user/getUserInfo')
+      }
+      next() // 放行
     }
   } else {
     // 没有token
@@ -32,10 +36,3 @@ router.beforeEach((to, from, next) => {
   }
 })
 
-/** *
- * 后置守卫
- * **/
-router.afterEach(() => {
-  console.log('123')
-  nprogress.done()
-})
