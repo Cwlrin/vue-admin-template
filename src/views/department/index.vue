@@ -30,22 +30,26 @@
   </div>
 </template>
 <script>
+import { getDepartment } from '@/api/department'
+
 export default {
   name: 'Department',
   data() {
     return {
-      depts: [{
-        name: '传智教育',
-        children: [
-          { name: '总裁办' },
-          { name: '行政部' },
-          { name: '财务部' }
-        ]
-      }],
+      depts: [],
       defaultProps: {
         children: 'children',
         label: 'name'
       }
+    }
+  },
+  created() {
+    this.getDepartment()
+  },
+  methods: {
+    async getDepartment() {
+      const result = await getDepartment()
+      this.depts = result
     }
   }
 }
