@@ -10,7 +10,7 @@
             <el-col :span="4">
               <span class="tree-manager">{{ data.managerName }}</span>
               <!-- $event 实参 表示类型 -->
-              <el-dropdown >
+              <el-dropdown>
                 <!-- 显示区域内容 -->
                 <span class="el-dropdown-link">
                   操作<i class="el-icon-arrow-down el-icon--right" />
@@ -31,6 +31,7 @@
 </template>
 <script>
 import { getDepartment } from '@/api/department'
+import { transListToTreeData } from '@/utils'
 
 export default {
   name: 'Department',
@@ -44,12 +45,12 @@ export default {
     }
   },
   created() {
-    this.getDepartment()
+    this.getDepartment() // 调用获取数据的接口
   },
   methods: {
     async getDepartment() {
       const result = await getDepartment()
-      this.depts = result
+      this.depts = transListToTreeData(result, 0)
     }
   }
 }
