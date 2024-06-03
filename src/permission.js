@@ -4,15 +4,13 @@ import 'nprogress/nprogress.css'
 import store from '@/store'
 
 /**
- *前置守卫
- *
+ * 前置守卫
  */
-
 const whiteList = ['/login', '/404']
 router.beforeEach(async(to, from, next) => {
   nprogress.start()
   if (store.getters.token) {
-    // 存在token
+    // 存在 token
     if (to.path === '/login') {
       // 跳转到主页
       next('/') // 中转到主页
@@ -26,7 +24,7 @@ router.beforeEach(async(to, from, next) => {
       next() // 放过
     }
   } else {
-    // 没有token
+    // 没有 token
     if (whiteList.includes(to.path)) {
       next()
     } else {
@@ -38,7 +36,7 @@ router.beforeEach(async(to, from, next) => {
 
 /** *
  * 后置守卫
- * **/
+ */
 router.afterEach(() => {
   console.log('123')
   nprogress.done()

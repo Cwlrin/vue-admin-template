@@ -30,7 +30,7 @@
   </el-dialog>
 </template>
 <script>
-import { getDepartment, getManagerList, addDepartment, getDepartmentDetail, updateDepartment } from '@/api/department'
+import { updateDepartment, getDepartmentDetail, getDepartment, getManagerList, addDepartment } from '@/api/department'
 export default {
   props: {
     showDialog: {
@@ -87,7 +87,7 @@ export default {
             trigger: 'blur',
             // 自定义校验模式
             validator: async(rule, value, callback) => {
-              // value就是输入的名称
+              // value就是输入的编码
               let result = await getDepartment()
               if (this.formData.id) {
                 // 编辑场景 排除自身
@@ -152,6 +152,7 @@ export default {
         }
       })
     },
+    // 获取组织的详情
     async getDepartmentDetail() {
       this.formData = await getDepartmentDetail(this.currentNodeId)
     }

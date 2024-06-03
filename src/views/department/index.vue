@@ -30,11 +30,12 @@
     </div>
     <!-- 放置弹层 -->
     <!-- 表示会接受子组件的事件  update:showDialog, 值 => 属性 -->
+    <!-- ref 可以获取dom实例对象 ref也可以获取自定义组件的实例对象 -->
     <add-dept ref="addDept" :current-node-id="currentNodeId" :show-dialog.sync="showDialog" @updateDepartment="getDepartment" />
   </div>
 </template>
 <script>
-import {delDepartment, getDepartment} from '@/api/department'
+import { getDepartment, delDepartment } from '@/api/department'
 import { transListToTreeData } from '@/utils'
 import AddDept from './components/add-dept.vue'
 export default {
@@ -60,7 +61,6 @@ export default {
       const result = await getDepartment()
       this.depts = transListToTreeData(result, 0)
     },
-    // 操作部门方法
     // 操作部门方法
     operateDept(type, id) {
       if (type === 'add') {
