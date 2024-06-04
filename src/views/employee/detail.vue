@@ -97,6 +97,8 @@
 </template>
 
 <script>
+import { addEmployee } from '@/api/employee'
+
 export default {
   data() {
     return {
@@ -138,7 +140,14 @@ export default {
   },
   methods: {
     saveData() {
-      this.$refs.userForm.validate()
+      this.$refs.userForm.validate(async isOK => {
+        if (isOK) {
+          // 校验通过
+          await addEmployee(this.userInfo)
+          this.$message.success('新增员工成功')
+          this.$router.push('/employee')
+        }
+      })
     }
   }
 }
