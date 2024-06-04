@@ -28,7 +28,40 @@
           <el-button size="mini">excel导出</el-button>
         </el-row>
         <!-- 表格组件 -->
+        <el-table :data="list">
+          <el-table-column prop="staffPhoto" align="center" label="头像">
+            <template v-slot="{ row }">
+              <el-avatar v-if="row.staffPhoto" :src="row.staffPhoto" :size="30" />
+              <span v-else class="username">{{ row.username?.charAt(0) }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="username" label="姓名" />
+          <el-table-column prop="mobile" label="手机号" sortable />
+          <el-table-column prop="workNumber" label="工号" sortable />
+          <el-table-column prop="formOfEmployment" label="聘用形式">
+            <template v-slot="{ row }">
+              <span v-if="row.formOfEmployment === 1">正式</span>
+              <span v-else-if="row.formOfEmployment === 2">非正式</span>
+              <span v-else>无</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="departmentName" label="部门" />
+          <el-table-column prop="timeOfEntry" label="入职时间" sortable />
+          <el-table-column label="操作" width="280px">
+            <template>
+              <el-button size="mini" type="text">查看</el-button>
+              <el-button size="mini" type="text">角色</el-button>
+              <el-button size="mini" type="text">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
         <!-- 分页 -->
+        <el-row style="height: 60px" align="middle" type="flex" justify="end">
+          <el-pagination
+            layout="total,prev, pager, next"
+            :total="1000"
+          />
+        </el-row>
       </div>
     </div>
   </div>
@@ -37,6 +70,7 @@
 <script>
 import { getDepartment } from '@/api/department'
 import { transListToTreeData } from '@/utils'
+import { getEmployeeList } from '@/api/employee'
 
 export default {
   name: 'Employee',
@@ -50,7 +84,8 @@ export default {
       // 存储查询参数
       queryParams: {
         departmentId: null
-      }
+      },
+      list: []
     }
   },
   created() {
@@ -68,9 +103,17 @@ export default {
         // 此时意味着树渲染完毕
         this.$refs.deptTree.setCurrentKey(this.queryParams.departmentId)
       })
+      // 这个时候参数 记录了id
+      this.getEmployeeList()
     },
+    // 获取员工列表的方法
     selectNode(node) {
-      this.queryParams.departmentId = node.id
+      this.queryParams.departmentId = node.id // 重新记录了参数
+      this.getEmployeeList()
+    },
+    async getEmployeeList() {
+      const { rows } = await getEmployeeList(this.queryParams)
+      this.list = rows
     }
   }
 }
