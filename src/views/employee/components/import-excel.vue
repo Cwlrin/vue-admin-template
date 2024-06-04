@@ -32,6 +32,7 @@
 <script>
 import { getExportTemplate, uploadExcel } from '@/api/employee'
 import FileSaver from 'file-saver'
+
 export default {
   props: {
     showExcelDialog: {
@@ -44,6 +45,7 @@ export default {
       const data = await getExportTemplate()
       FileSaver.saveAs(data, '员工导入模版.xlsx')
     },
+    // 弹出文件选择器-只有一种方式 通过input file
     handleUpload() {
       this.$refs['excel-upload-input'].click() // this.$refs.属性名 和 this.$refs[属性名] 等价
     },
@@ -85,10 +87,12 @@ export default {
   height: 180px;
   align-items: center;
   color: #697086;
+
   .excel-upload-input {
     display: none;
     z-index: -9999;
   }
+
   .btn-upload,
   .drop {
     border: 1px dashed #dcdfe6;
@@ -101,9 +105,11 @@ export default {
     flex-direction: column;
     justify-content: center;
   }
+
   .drop {
     line-height: 40px;
     color: #bbb;
+
     i {
       font-size: 60px;
       display: block;

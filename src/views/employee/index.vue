@@ -50,14 +50,19 @@
           <el-table-column prop="departmentName" label="部门" />
           <el-table-column prop="timeOfEntry" label="入职时间" sortable />
           <el-table-column label="操作" width="280px">
-            <template>
-              <el-button size="mini" type="text">查看</el-button>
+            <template v-slot="{ row }">
+              <el-button size="mini" type="text" @click="$router.push(`/employee/detail/${row.id}`)">查看</el-button>
               <el-button size="mini" type="text">角色</el-button>
-              <el-popconfirm title="确认删除该行数据吗？" @onConfirm="confirmDel(row.id)">
+              <el-popconfirm
+                title="确认删除该行数据吗？"
+                @onConfirm="confirmDel(row.id)"
+              >
                 <el-button slot="reference" style="margin-left:10px" size="mini" type="text">删除</el-button>
               </el-popconfirm>
+
             </template>
           </el-table-column>
+
         </el-table>
         <!-- 分页 -->
         <el-row style="height: 60px" align="middle" type="flex" justify="end">
@@ -71,16 +76,18 @@
         </el-row>
       </div>
     </div>
+    <!-- 放置导入组件 -->
     <import-excel :show-excel-dialog.sync="showExcelDialog" @uploadSuccess="getEmployeeList" />
   </div>
 </template>
 
 <script>
 import { getDepartment } from '@/api/department'
-import { delEmployee, exportEmployee, getEmployeeList } from '@/api/employee'
+import { getEmployeeList, exportEmployee, delEmployee } from '@/api/employee'
 import { transListToTreeData } from '@/utils'
 import FileSaver from 'file-saver'
-import ImportExcel from '@/views/employee/components/import-excel.vue'
+import ImportExcel from './components/import-excel.vue'
+
 export default {
   name: 'Employee',
   components: {
@@ -150,6 +157,9 @@ export default {
         this.getEmployeeList()
       }, 300)
     },
+    /** *
+     * 导出员工的excel
+     */
     async exportEmployee() {
       const result = await exportEmployee() // 导出所有的员工接口
       // console.log(result) // 使用一个npm包 直接将blob文件下载到本地 file-saver
@@ -171,17 +181,21 @@ export default {
 .app-container {
   background: #fff;
   display: flex;
+
   .left {
     width: 280px;
     padding: 20px;
     border-right: 1px solid #eaeef4;
   }
+
   .right {
     flex: 1;
     padding: 20px;
+
     .opeate-tools {
       margin: 10px;
     }
+
     .username {
       height: 30px;
       width: 30px;
@@ -195,4 +209,5 @@ export default {
     }
   }
 }
+
 </style>

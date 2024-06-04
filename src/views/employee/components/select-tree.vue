@@ -13,15 +13,18 @@
 import { getDepartment } from '@/api/department'
 import { transListToTreeData } from '@/utils'
 export default {
+  props: {
+    value: {
+      type: Number, // 存储的是部门的id  3 4 5
+      default: null
+    }
+  },
   data() {
     return {
       treeData: [], // 赋值给 级联组件的options
       props: {
         label: 'name', // 要展示的字段
-        value: {
-          type: Number, // 存储的是部门的id  3 4 5
-          default: null
-        }
+        value: 'id' // 要存储的字段
       }
     }
   },
