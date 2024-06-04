@@ -8,20 +8,40 @@
       <!-- 放置table组件 -->
       <el-table :data="list">
         <!-- 放置列 -->
-        <el-table-column prop="name" align="center" width="200" label="角色" />
+        <el-table-column prop="name" align="center" width="200" label="角色">
+          <template v-slot="{ row }">
+            <!-- 条件判断 -->
+            <el-input v-if="row.isEdit" v-model="row.editRow.name" size="mini" />
+            <span v-else>{{ row.name }}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="state" align="center" width="200" label="启用">
           <!-- 自定义列结构 -->
           <template v-slot="{ row }">
-            <span>  {{ row.state === 1 ? "已启用" : row.state === 0 ? "未启用" : "无" }} </span>
+            <!-- 开 1 关 0 -->
+            <el-switch v-if="row.isEdit" v-model="row.editRow.state" :active-value="1" :inactive-value="0" />
+            <span v-else>  {{ row.state === 1 ? "已启用" : row.state === 0 ? "未启用" : "无" }} </span>
           </template>
         </el-table-column>
-        <el-table-column prop="description" align="center" label="描述" />
+        <el-table-column prop="description" align="center" label="描述">
+          <template v-slot="{ row }">
+            <el-input v-if="row.isEdit" v-model="row.editRow.description" size="mini" type="textarea" />
+            <span v-else>{{ row.description }}</span>
+          </template>
+        </el-table-column>
         <el-table-column align="center" label="操作">
-          <!-- 放置操作按钮 -->
-          <template>
-            <el-button size="mini" type="text">分配权限</el-button>
-            <el-button size="mini" type="text">编辑</el-button>
-            <el-button size="mini" type="text">删除</el-button>
+          <template v-slot="{ row }">
+            <template v-if="row.isEdit">
+              <!-- 编辑状态 -->
+              <el-button type="primary" size="mini" @click="btnEditOK(row)">确定</el-button>
+              <el-button size="mini" @click="row.isEdit = false">取消</el-button>
+            </template>
+            <template v-else>
+              <!-- 非编辑状态 -->
+              <el-button size="mini" type="text">分配权限</el-button>
+              <el-button size="mini" type="text" @click="btnEditRow(row)">编辑</el-button>
+              <el-button size="mini" type="text">删除</el-button>
+            </template>
           </template>
         </el-table-column>
       </el-table>
@@ -65,7 +85,7 @@
   </div>
 </template>
 <script>
-import { getRoleList, addRole } from '@/api/role'
+import { getRoleList, addRole, updateRole } from '@/api/role'
 export default {
   name: 'Role',
   data() {
@@ -97,6 +117,19 @@ export default {
       const { rows, total } = await getRoleList(this.pageParams)
       this.list = rows // 赋值数据
       this.pageParams.total = total
+      // 针对每一行数据添加一个编辑标记
+      this.list.forEach(item => {
+        // item.isEdit = false // 添加一个属性 初始值为false
+        // 数据响应式的问题  数据变化 视图更新
+        // 添加的动态属性 不具备响应式特点
+        // this.$set(目标对象, 属性名称, 初始值) 可以针对目标对象 添加的属性 添加响应式
+        this.$set(item, 'isEdit', false)
+        this.$set(item, 'editRow', {
+          name: item.name,
+          state: item.state,
+          description: item.description
+        })
+      })
     },
     // 切换分页时 请求新的数据
     changePage(newPage) {
@@ -116,6 +149,32 @@ export default {
     btnCancel() {
       this.$refs.roleForm.resetFields() // 重置表单数据
       this.showDialog = false // 关闭弹层
+    },
+    // 点击编辑行
+    btnEditRow(row) {
+      row.isEdit = true // 改变行的编辑状态
+      // 更新缓存数据
+      row.editRow.name = row.name
+      row.editRow.state = row.state
+      row.editRow.description = row.description
+    },
+    // 点击确定时触发
+    async  btnEditOK(row) {
+      if (row.editRow.name && row.editRow.description) {
+        // 下一步操作
+        await updateRole({ ...row.editRow, id: row.id })
+        // 更新成功
+        this.$message.success('更新角色成功')
+        // 更新显示数据  退出编辑状态
+        // row.name = row.editRow.name // eslint的一校验 误判
+        // Object.assign(target, source)
+        Object.assign(row, {
+          ...row.editRow,
+          isEdit: false // 退出编辑模式
+        }) // 规避eslint的误判
+      } else {
+        this.$message.warning('角色和描述不能为空')
+      }
     }
   }
 }
