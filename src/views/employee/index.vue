@@ -3,11 +3,13 @@
     <div class="app-container">
       <div class="left">
         <el-input
+          v-model="queryParams.keyword"
           style="margin-bottom:10px"
           type="text"
           prefix-icon="el-icon-search"
           size="small"
           placeholder="输入员工姓名全员搜索"
+          @input="changeValue"
         />
         <!-- 树形组件 -->
         <el-tree
@@ -32,7 +34,7 @@
           <el-table-column prop="staffPhoto" align="center" label="头像">
             <template v-slot="{ row }">
               <el-avatar v-if="row.staffPhoto" :src="row.staffPhoto" :size="30" />
-              <span v-else class="username">{{ row.username?.charAt(0) }}</span>
+              <span v-else class="username">{{ row.username.charAt(0) }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="username" label="姓名" />
@@ -59,7 +61,10 @@
         <el-row style="height: 60px" align="middle" type="flex" justify="end">
           <el-pagination
             layout="total,prev, pager, next"
-            :total="1000"
+            :total="total"
+            :current-page="queryParams.page"
+            :page-size="queryParams.pagesize"
+            @current-change="changePage"
           />
         </el-row>
       </div>
@@ -69,9 +74,8 @@
 
 <script>
 import { getDepartment } from '@/api/department'
-import { transListToTreeData } from '@/utils'
 import { getEmployeeList } from '@/api/employee'
-
+import { transListToTreeData } from '@/utils'
 export default {
   name: 'Employee',
   data() {
@@ -83,9 +87,13 @@ export default {
       },
       // 存储查询参数
       queryParams: {
-        departmentId: null
+        departmentId: null,
+        page: 1, // 当前页码
+        pagesize: 10,
+        keyword: ''
       },
-      list: []
+      total: 0, // 记录员工的总数
+      list: [] // 存储员工列表数据
     }
   },
   created() {
@@ -96,6 +104,7 @@ export default {
       // 递归方法 将列表转化成树形
       // let result = await getDepartment()
       this.depts = transListToTreeData(await getDepartment(), 0)
+      // console.log(this.depts[0])
       this.queryParams.departmentId = this.depts[0].id
       // 设置选中节点
       // 树组件渲染是异步的 等到更新完毕
@@ -106,14 +115,31 @@ export default {
       // 这个时候参数 记录了id
       this.getEmployeeList()
     },
-    // 获取员工列表的方法
     selectNode(node) {
       this.queryParams.departmentId = node.id // 重新记录了参数
+      this.queryParams.page = 1 // 设置第一页
       this.getEmployeeList()
     },
+    // 获取员工列表的方法
     async getEmployeeList() {
-      const { rows } = await getEmployeeList(this.queryParams)
+      const { rows, total } = await getEmployeeList(this.queryParams)
       this.list = rows
+      this.total = total
+    },
+    // 切换页码
+    changePage(newPage) {
+      this.queryParams.page = newPage // 赋值新页码
+      this.getEmployeeList() // 查询数据
+    },
+    // 输入值内容改变时触发
+    changeValue() {
+      // 单位时间内只执行最后一次
+      // this的实例上赋值了一个timer的属性
+      clearTimeout(this.timer) // 清理上一次的定时器
+      this.timer = setTimeout(() => {
+        this.queryParams.page = 1
+        this.getEmployeeList()
+      }, 300)
     }
   }
 }
@@ -123,21 +149,17 @@ export default {
 .app-container {
   background: #fff;
   display: flex;
-
   .left {
     width: 280px;
     padding: 20px;
     border-right: 1px solid #eaeef4;
   }
-
   .right {
     flex: 1;
     padding: 20px;
-
     .opeate-tools {
       margin: 10px;
     }
-
     .username {
       height: 30px;
       width: 30px;
@@ -151,5 +173,4 @@ export default {
     }
   }
 }
-
 </style>

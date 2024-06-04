@@ -33,7 +33,6 @@ export function addDepartment(data) {
 /**
  * 获取部门详情
  */
-
 export function getDepartmentDetail(id) {
   return request({
     url: `/company/department/${id}`
@@ -54,7 +53,6 @@ export function updateDepartment(data) {
 /**
  * 删除部门
  */
-
 export function delDepartment(id) {
   return request({
     method: 'delete',
