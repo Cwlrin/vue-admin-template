@@ -8,14 +8,14 @@
       <!-- 放置table组件 -->
       <el-table :data="list">
         <!-- 放置列 -->
-        <el-table-column prop="name" align="center" width="200" label="角色">
+        <el-table-column align="center" label="角色" prop="name" width="200">
           <template v-slot="{ row }">
             <!-- 条件判断 -->
             <el-input v-if="row.isEdit" v-model="row.editRow.name" size="mini" />
             <span v-else>{{ row.name }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="state" align="center" width="200" label="启用">
+        <el-table-column align="center" label="启用" prop="state" width="200">
           <!-- 自定义列结构 -->
           <template v-slot="{ row }">
             <!-- 开 1 关 0 -->
@@ -23,7 +23,7 @@
             <span v-else>  {{ row.state === 1 ? "已启用" : row.state === 0 ? "未启用" : "无" }} </span>
           </template>
         </el-table-column>
-        <el-table-column prop="description" align="center" label="描述">
+        <el-table-column align="center" label="描述" prop="description">
           <template v-slot="{ row }">
             <el-input v-if="row.isEdit" v-model="row.editRow.description" size="mini" type="textarea" />
             <span v-else>{{ row.description }}</span>
@@ -34,29 +34,29 @@
           <template v-slot="{ row }">
             <template v-if="row.isEdit">
               <!-- 编辑状态 -->
-              <el-button type="primary" size="mini" @click="btnEditOK(row)">确定</el-button>
+              <el-button size="mini" type="primary" @click="btnEditOK(row)">确定</el-button>
               <el-button size="mini" @click="row.isEdit = false">取消</el-button>
             </template>
             <template v-else>
               <!-- 非编辑状态 -->
-              <el-button size="mini" type="text">分配权限</el-button>
+              <el-button size="mini" type="text" @click="btnPermission(row.id)">分配权限</el-button>
               <el-button size="mini" type="text" @click="btnEditRow(row)">编辑</el-button>
               <el-popconfirm
                 title="这是一段内容确定删除吗？"
                 @onConfirm="confirmDel(row.id)"
               >
-                <el-button slot="reference" style="margin-left:10px" size="mini" type="text">删除</el-button>
+                <el-button slot="reference" size="mini" style="margin-left:10px" type="text">删除</el-button>
               </el-popconfirm>
             </template>
           </template>
         </el-table-column>
       </el-table>
       <!-- 放置分页组件 -->
-      <el-row type="flex" style="height:60px" align="middle" justify="end">
+      <el-row align="middle" justify="end" style="height:60px" type="flex">
         <!-- 放置分页组件 -->
         <el-pagination
-          :page-size="pageParams.pagesize"
           :current-page="pageParams.page"
+          :page-size="pageParams.pagesize"
           :total="pageParams.total"
           layout="prev, pager, next"
           @current-change="changePage"
@@ -64,34 +64,57 @@
       </el-row>
     </div>
     <!-- 放置弹层 -->
-    <el-dialog width="500px" title="新增角色" :visible.sync="showDialog" @close="btnCancel">
+    <el-dialog :visible.sync="showDialog" title="新增角色" width="500px" @close="btnCancel">
       <!-- 表单内容 -->
       <el-form ref="roleForm" :model="roleForm" :rules="rules" label-width="120px">
-        <el-form-item prop="name" label="角色名称">
-          <el-input v-model="roleForm.name" style="width:300px" size="mini" />
+        <el-form-item label="角色名称" prop="name">
+          <el-input v-model="roleForm.name" size="mini" style="width:300px" />
         </el-form-item>
         <el-form-item label="启用" prop="state">
           <!-- 重置表单数据 需要prop属性 -->
           <!-- 如果不需要校验 就不需要写 prop属性 -->
           <el-switch v-model="roleForm.state" :active-value="1" :inactive-value="0" size="mini" />
         </el-form-item>
-        <el-form-item prop="description" label="角色描述">
-          <el-input v-model="roleForm.description" type="textarea" :rows="3" style="width:300px" size="mini" />
+        <el-form-item label="角色描述" prop="description">
+          <el-input v-model="roleForm.description" :rows="3" size="mini" style="width:300px" type="textarea" />
         </el-form-item>
         <el-form-item>
-          <el-row type="flex" justify="center">
+          <el-row justify="center" type="flex">
             <el-col :span="12">
-              <el-button type="primary" size="mini" @click="btnOK">确定</el-button>
+              <el-button size="mini" type="primary" @click="btnOK">确定</el-button>
               <el-button size="mini" @click="btnCancel">取消</el-button>
             </el-col>
           </el-row>
         </el-form-item>
       </el-form>
     </el-dialog>
+    <!-- 放置权限弹层 -->
+    <el-dialog :visible.sync="showPermissionDialog" title="分配权限">
+      <!-- 放置权限数据 -->
+      <el-tree
+        ref="permTree"
+        :data="permissionData"
+        :default-checked-keys="permIds"
+        :props="{ label: 'name' }"
+        check-strictly
+        default-expand-all
+        node-key="id"
+        show-checkbox
+      />
+      <el-row slot="footer" justify="center" type="flex">
+        <el-col :span="6">
+          <el-button size="mini" type="primary" @click="btnPermissionOK">确定</el-button>
+          <el-button size="mini" @click="showPermissionDialog = false">取消</el-button>
+        </el-col>
+      </el-row>
+    </el-dialog>
   </div>
 </template>
 <script>
-import { getRoleList, addRole, updateRole, delRole } from '@/api/role'
+import { getRoleList, addRole, updateRole, delRole, getRoleDetail, assignPerm } from '@/api/role'
+import { getPermissionList } from '@/api/permission'
+import { transListToTreeData } from '@/utils'
+
 export default {
   name: 'Role',
   data() {
@@ -112,7 +135,11 @@ export default {
       rules: {
         name: [{ required: true, message: '角色名称不能为空', trigger: 'blur' }],
         description: [{ required: true, message: '角色描述不能为空', trigger: 'blur' }]
-      }
+      },
+      showPermissionDialog: false,
+      permissionData: [],
+      currentRoleId: null,
+      permIds: []
     }
   },
   created() {
@@ -165,7 +192,7 @@ export default {
       row.editRow.description = row.description
     },
     // 点击确定时触发
-    async  btnEditOK(row) {
+    async btnEditOK(row) {
       if (row.editRow.name && row.editRow.description) {
         // 下一步操作
         await updateRole({ ...row.editRow, id: row.id })
@@ -183,12 +210,28 @@ export default {
       }
     },
     // 点击了确定触发的
-    async  confirmDel(id) {
+    async confirmDel(id) {
       await delRole(id) // 后端删除
       this.$message.success('删除角色成功')
       // 删除的如果是最后一个
       if (this.list.length === 1) this.pageParams.page--
       this.getRoleList()
+    },
+    async btnPermission(id) {
+      this.currentRoleId = id
+      const { permIds } = await getRoleDetail(id)
+      this.permIds = permIds
+      this.permissionData = transListToTreeData(await getPermissionList(), 0)
+      this.showPermissionDialog = true
+    },
+    // 点击确定时触发
+    async btnPermissionOK() {
+      await assignPerm({
+        id: this.currentRoleId,
+        permIds: this.$refs.permTree.getCheckedKeys()
+      })
+      this.$message.success('角色分配权限成功')
+      this.showPermissionDialog = false
     }
   }
 }

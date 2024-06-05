@@ -52,7 +52,7 @@
           <el-table-column label="操作" width="280px">
             <template v-slot="{ row }">
               <el-button size="mini" type="text" @click="$router.push(`/employee/detail/${row.id}`)">查看</el-button>
-              <el-button size="mini" type="text">角色</el-button>
+              <el-button size="mini" type="text" @click="btnRole(row.id)">角色</el-button>
               <el-popconfirm
                 title="确认删除该行数据吗？"
                 @onConfirm="confirmDel(row.id)"
@@ -88,6 +88,7 @@
         >{{ item.name }}
         </el-checkbox>
       </el-checkbox-group>
+      <!-- 确定和取消按钮 -->
       <el-row slot="footer" justify="center" type="flex">
         <el-col :span="6">
           <el-button size="mini" type="primary" @click="btnRoleOK">确定</el-button>

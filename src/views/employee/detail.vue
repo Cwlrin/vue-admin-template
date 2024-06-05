@@ -7,7 +7,7 @@
           <el-row>
             <el-col :span="12">
               <el-form-item label="姓名" prop="username">
-                <el-input v-model="userInfo.username" size="mini" class="inputW" />
+                <el-input v-model="userInfo.username" class="inputW" size="mini" />
               </el-form-item>
             </el-col>
           </el-row>
@@ -16,7 +16,7 @@
             <el-col :span="12">
               <el-form-item label="工号" prop="workNumber">
                 <!-- 工号是系统生成的  禁用这个组件-->
-                <el-input v-model="userInfo.workNumber" disabled size="mini" class="inputW" />
+                <el-input v-model="userInfo.workNumber" class="inputW" disabled size="mini" />
               </el-form-item>
             </el-col>
           </el-row>
@@ -27,8 +27,8 @@
                 <el-input
                   v-model="userInfo.mobile"
                   :disabled="!!$route.params.id"
-                  size="mini"
                   class="inputW"
+                  size="mini"
                 />
               </el-form-item>
             </el-col>
@@ -45,9 +45,9 @@
           <el-row>
             <el-col :span="12">
               <el-form-item label="聘用形式" prop="formOfEmployment">
-                <el-select v-model="userInfo.formOfEmployment" size="mini" class="inputW">
-                  <el-option label="正式" :value="1" />
-                  <el-option label="非正式" :value="2" />
+                <el-select v-model="userInfo.formOfEmployment" class="inputW" size="mini">
+                  <el-option :value="1" label="正式" />
+                  <el-option :value="2" label="非正式" />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -57,10 +57,10 @@
               <el-form-item label="入职时间" prop="timeOfEntry">
                 <el-date-picker
                   v-model="userInfo.timeOfEntry"
+                  class="inputW"
                   size="mini"
                   type="date"
                   value-format="yyyy-MM-dd"
-                  class="inputW"
                 />
               </el-form-item>
             </el-col>
@@ -70,9 +70,9 @@
               <el-form-item label="转正时间" prop="correctionTime">
                 <el-date-picker
                   v-model="userInfo.correctionTime"
+                  class="inputW"
                   size="mini"
                   type="date"
-                  class="inputW"
                 />
               </el-form-item>
             </el-col>
@@ -100,11 +100,11 @@
 
 <script>
 import SelectTree from './components/select-tree.vue'
+import ImageUpload from './components/image-upload.vue'
 import { addEmployee, getEmployeeDetail, updateEmployee } from '@/api/employee'
-import ImageUpload from '@/views/employee/components/image-upload.vue'
 
 export default {
-  components: { ImageUpload, SelectTree },
+  components: { SelectTree, ImageUpload },
   data() {
     return {
       userInfo: {
@@ -114,7 +114,8 @@ export default {
         formOfEmployment: null, // 聘用形式
         departmentId: null, // 部门id
         timeOfEntry: '', // 入职时间
-        correctionTime: '' // 转正时间
+        correctionTime: '', // 转正时间
+        staffPhoto: ''
       },
       rules: {
         username: [{ required: true, message: '请输入姓名', trigger: 'blur' }, {
@@ -174,7 +175,7 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .edit-form {
   background: #fff;
   padding: 20px;

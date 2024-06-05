@@ -1,8 +1,8 @@
 <template>
-  <div class="sidebar-logo-container" :class="{'collapse':collapse}">
+  <div :class="{'collapse':collapse}" class="sidebar-logo-container">
     <transition name="sidebarLogoFade">
       <router-link key="collapse" class="sidebar-logo-link" to="/">
-        <img src="@/assets/common/logo.png" class="sidebar-logo">
+        <img class="sidebar-logo" src="@/assets/common/logo.png">
       </router-link>
     </transition>
   </div>
