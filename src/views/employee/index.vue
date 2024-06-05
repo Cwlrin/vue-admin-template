@@ -4,51 +4,51 @@
       <div class="left">
         <el-input
           v-model="queryParams.keyword"
-          style="margin-bottom:10px"
-          type="text"
+          placeholder="输入员工姓名全员搜索"
           prefix-icon="el-icon-search"
           size="small"
-          placeholder="输入员工姓名全员搜索"
+          style="margin-bottom:10px"
+          type="text"
           @input="changeValue"
         />
         <!-- 树形组件 -->
         <el-tree
           ref="deptTree"
-          node-key="id"
           :data="depts"
+          :expand-on-click-node="false"
           :props="defaultProps"
           default-expand-all
-          :expand-on-click-node="false"
           highlight-current
+          node-key="id"
           @current-change="selectNode"
         />
       </div>
       <div class="right">
-        <el-row class="opeate-tools" type="flex" justify="end">
+        <el-row class="opeate-tools" justify="end" type="flex">
           <el-button size="mini" type="primary" @click="$router.push('/employee/detail')">添加员工</el-button>
           <el-button size="mini" @click="showExcelDialog = true">excel导入</el-button>
           <el-button size="mini" @click="exportEmployee">excel导出</el-button>
         </el-row>
         <!-- 表格组件 -->
         <el-table :data="list">
-          <el-table-column prop="staffPhoto" align="center" label="头像">
+          <el-table-column align="center" label="头像" prop="staffPhoto">
             <template v-slot="{ row }">
-              <el-avatar v-if="row.staffPhoto" :src="row.staffPhoto" :size="30" />
+              <el-avatar v-if="row.staffPhoto" :size="30" :src="row.staffPhoto" />
               <span v-else class="username">{{ row.username.charAt(0) }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="username" label="姓名" />
-          <el-table-column prop="mobile" label="手机号" sortable />
-          <el-table-column prop="workNumber" label="工号" sortable />
-          <el-table-column prop="formOfEmployment" label="聘用形式">
+          <el-table-column label="姓名" prop="username" />
+          <el-table-column label="手机号" prop="mobile" sortable />
+          <el-table-column label="工号" prop="workNumber" sortable />
+          <el-table-column label="聘用形式" prop="formOfEmployment">
             <template v-slot="{ row }">
               <span v-if="row.formOfEmployment === 1">正式</span>
               <span v-else-if="row.formOfEmployment === 2">非正式</span>
               <span v-else>无</span>
             </template>
           </el-table-column>
-          <el-table-column prop="departmentName" label="部门" />
-          <el-table-column prop="timeOfEntry" label="入职时间" sortable />
+          <el-table-column label="部门" prop="departmentName" />
+          <el-table-column label="入职时间" prop="timeOfEntry" sortable />
           <el-table-column label="操作" width="280px">
             <template v-slot="{ row }">
               <el-button size="mini" type="text" @click="$router.push(`/employee/detail/${row.id}`)">查看</el-button>
@@ -57,20 +57,18 @@
                 title="确认删除该行数据吗？"
                 @onConfirm="confirmDel(row.id)"
               >
-                <el-button slot="reference" style="margin-left:10px" size="mini" type="text">删除</el-button>
+                <el-button slot="reference" size="mini" style="margin-left:10px" type="text">删除</el-button>
               </el-popconfirm>
-
             </template>
           </el-table-column>
-
         </el-table>
         <!-- 分页 -->
-        <el-row style="height: 60px" align="middle" type="flex" justify="end">
+        <el-row align="middle" justify="end" style="height: 60px" type="flex">
           <el-pagination
-            layout="total,prev, pager, next"
-            :total="total"
             :current-page="queryParams.page"
             :page-size="queryParams.pagesize"
+            :total="total"
+            layout="total,prev, pager, next"
             @current-change="changePage"
           />
         </el-row>
@@ -78,12 +76,38 @@
     </div>
     <!-- 放置导入组件 -->
     <import-excel :show-excel-dialog.sync="showExcelDialog" @uploadSuccess="getEmployeeList" />
+    <el-dialog :visible.sync="showRoleDialog" title="分配角色">
+      <!-- 弹层内容 -->
+      <!-- checkbox -->
+      <el-checkbox-group v-model="roleIds">
+        <!-- 放置n个的checkbox  要执行checkbox的存储值 item.id-->
+        <el-checkbox
+          v-for="item in roleList"
+          :key="item.id"
+          :label="item.id"
+        >{{ item.name }}
+        </el-checkbox>
+      </el-checkbox-group>
+      <el-row slot="footer" justify="center" type="flex">
+        <el-col :span="6">
+          <el-button size="mini" type="primary" @click="btnRoleOK">确定</el-button>
+          <el-button size="mini" @click="showRoleDialog = false">取消</el-button>
+        </el-col>
+      </el-row>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { getDepartment } from '@/api/department'
-import { getEmployeeList, exportEmployee, delEmployee } from '@/api/employee'
+import {
+  getEmployeeList,
+  exportEmployee,
+  delEmployee,
+  getEnableRoleList,
+  getEmployeeDetail,
+  assignRole
+} from '@/api/employee'
 import { transListToTreeData } from '@/utils'
 import FileSaver from 'file-saver'
 import ImportExcel from './components/import-excel.vue'
@@ -109,7 +133,11 @@ export default {
       },
       total: 0, // 记录员工的总数
       list: [], // 存储员工列表数据
-      showExcelDialog: false // 控制 excel 的弹层显示和隐藏
+      showExcelDialog: false, // 控制 excel 的弹层显示和隐藏
+      showRoleDialog: false, // 用来控制角色弹层的显示
+      roleList: [], // 接收角色列表
+      roleIds: [], // 用来双向绑定数据的
+      currentUserId: null // 用来记录当前点击的用户id
     }
   },
   created() {
@@ -172,6 +200,24 @@ export default {
       if (this.list.length === 1 && this.queryParams.page > 1) this.queryParams.page--
       this.getEmployeeList()
       this.$message.success('删除员工成功')
+    },
+    // 点击角色按钮弹出层
+    async btnRole(id) {
+      this.roleList = await getEnableRoleList()
+      // 记录当前点击的id 因为后边 确定取消要存取给对应的用户
+      this.currentUserId = id
+      const { roleIds } = await getEmployeeDetail(id)
+      this.roleIds = roleIds
+      this.showRoleDialog = true // 调整顺序
+    },
+    // 点击角色的确定
+    async btnRoleOK() {
+      await assignRole({
+        id: this.currentUserId,
+        roleIds: this.roleIds
+      })
+      this.$message.success('分配用户角色成功')
+      this.showRoleDialog = false
     }
   }
 }
@@ -209,5 +255,4 @@ export default {
     }
   }
 }
-
 </style>
