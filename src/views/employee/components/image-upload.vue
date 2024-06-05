@@ -1,10 +1,10 @@
 <template>
   <el-upload
-    class="avatar-uploader"
-    action=""
-    :show-file-list="false"
     :before-upload="beforeAvatarUpload"
     :http-request="uploadImage"
+    :show-file-list="false"
+    action=""
+    class="avatar-uploader"
   >
     <!-- (自动上传)action是上传地址 人资项目不需要 人资项目(手动上传)  -->
     <!-- show-file-list不展示列表 -->
@@ -15,6 +15,7 @@
 
 <script>
 import COS from 'cos-js-sdk-v5'
+
 export default {
   props: {
     value: {
@@ -36,7 +37,6 @@ export default {
       }
       return isJPG && isLt2M
     },
-
     // 选择图片上传
     uploadImage(params) {
       console.log(params.file)

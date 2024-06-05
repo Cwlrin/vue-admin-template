@@ -25,7 +25,9 @@
       </div>
       <div class="right">
         <el-row class="opeate-tools" justify="end" type="flex">
-          <el-button v-permission="'add-employee'" size="mini" type="primary" @click="$router.push('/employee/detail')">添加员工</el-button>
+          <el-button v-permission="'add-employee'" size="mini" type="primary" @click="$router.push('/employee/detail')">
+            添加员工
+          </el-button>
           <el-button size="mini" @click="showExcelDialog = true">excel导入</el-button>
           <el-button size="mini" @click="exportEmployee">excel导出</el-button>
         </el-row>
@@ -186,7 +188,7 @@ export default {
         this.getEmployeeList()
       }, 300)
     },
-    /** *
+    /**
      * 导出员工的excel
      */
     async exportEmployee() {

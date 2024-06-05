@@ -23,9 +23,7 @@ export function getManagerList() {
  */
 export function addDepartment(data) {
   return request({
-    method: 'post',
-    url: '/company/department',
-    data
+    method: 'post', url: '/company/department', data
   })
 }
 
@@ -43,9 +41,7 @@ export function getDepartmentDetail(id) {
  */
 export function updateDepartment(data) {
   return request({
-    method: 'put',
-    url: `/company/department/${data.id}`,
-    data
+    method: 'put', url: `/company/department/${data.id}`, data
   })
 }
 
@@ -54,7 +50,6 @@ export function updateDepartment(data) {
  */
 export function delDepartment(id) {
   return request({
-    method: 'delete',
-    url: `/company/department/${id}`
+    method: 'delete', url: `/company/department/${id}`
   })
 }

@@ -53,7 +53,10 @@ export const constantRoutes = [{
     component: () => import('@/views/dashboard/index'),
     meta: { title: '首页', icon: 'dashboard' }
   }]
-}]
+}
+
+  // 404 page must be placed at the end !!!
+]
 // 动态路由
 export const asyncRoutes = [departmentRouter, roleRouter, employeeRouter, permissionRouter, attendanceRouter, approvalRouter, salaryRouter, socialRouter]
 const createRouter = () => new Router({

@@ -5,8 +5,7 @@ import request from '@/utils/request'
  */
 export function getEmployeeList(params) {
   return request({
-    url: '/sys/user',
-    params // 地址参数 查询参数
+    url: '/sys/user', params // 地址参数 查询参数
   })
 }
 
@@ -15,8 +14,7 @@ export function getEmployeeList(params) {
  */
 export function exportEmployee() {
   return request({
-    url: '/sys/user/export',
-    // 改变接收数据的类型
+    url: '/sys/user/export', // 改变接收数据的类型
     responseType: 'blob' // 使用blob接收二进制文件流
   })
 }
@@ -26,8 +24,7 @@ export function exportEmployee() {
  */
 export function getExportTemplate() {
   return request({
-    url: '/sys/user/import/template',
-    responseType: 'blob' // 二进制文件流
+    url: '/sys/user/import/template', responseType: 'blob' // 二进制文件流
   })
 }
 
@@ -36,9 +33,7 @@ export function getExportTemplate() {
  */
 export function uploadExcel(data) {
   return request({
-    url: '/sys/user/import',
-    method: 'post',
-    data // form-data类型 因为要上传文件类型
+    url: '/sys/user/import', method: 'post', data // form-data类型 因为要上传文件类型
   })
 }
 
@@ -47,8 +42,7 @@ export function uploadExcel(data) {
  */
 export function delEmployee(id) {
   return request({
-    method: 'delete',
-    url: `/sys/user/${id}`
+    method: 'delete', url: `/sys/user/${id}`
   })
 }
 
@@ -57,9 +51,7 @@ export function delEmployee(id) {
  */
 export function addEmployee(data) {
   return request({
-    url: '/sys/user',
-    method: 'post',
-    data
+    url: '/sys/user', method: 'post', data
   })
 }
 
@@ -77,9 +69,7 @@ export function getEmployeeDetail(id) {
  */
 export function updateEmployee(data) {
   return request({
-    url: `/sys/user/${data.id}`,
-    method: 'put',
-    data
+    url: `/sys/user/${data.id}`, method: 'put', data
   })
 }
 
@@ -97,8 +87,6 @@ export function getEnableRoleList() {
  */
 export function assignRole(data) {
   return request({
-    url: '/sys/user/assignRoles',
-    method: 'put',
-    data
+    url: '/sys/user/assignRoles', method: 'put', data
   })
 }

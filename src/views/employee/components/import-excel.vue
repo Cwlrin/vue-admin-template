@@ -1,17 +1,17 @@
 <template>
   <el-dialog
-    width="500px"
-    title="员工导入"
     :visible="showExcelDialog"
+    title="员工导入"
+    width="500px"
     @close="$emit('update:showExcelDialog', false)"
   >
-    <el-row type="flex" justify="center">
+    <el-row justify="center" type="flex">
       <div class="upload-excel">
         <input
           ref="excel-upload-input"
+          accept=".xlsx, .xls"
           class="excel-upload-input"
           type="file"
-          accept=".xlsx, .xls"
           @change="uploadChange"
         >
         <div class="drop">
@@ -23,7 +23,7 @@
         </div>
       </div>
     </el-row>
-    <el-row type="flex" justify="end">
+    <el-row justify="end" type="flex">
       <!-- update:props属性名，值 直接修改 .sync修饰符的属性值 -->
       <el-button size="mini" type="primary" @click="$emit('update:showExcelDialog', false)">取消</el-button>
     </el-row>
@@ -78,7 +78,7 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .upload-excel {
   display: flex;
   justify-content: center;
