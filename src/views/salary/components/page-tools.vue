@@ -12,7 +12,6 @@
           <slot name="after" />
         </el-row>
       </el-col>
-
     </el-row>
   </el-card>
 </template>
@@ -41,7 +40,7 @@ export default {
     }
 
     display: inline-block;
-    padding: 0px 10px;
+    padding: 0 10px;
     border-radius: 3px;
     border: 1px solid rgba(145, 213, 255, 1);
     background: rgba(230, 247, 255, 1);

@@ -7,7 +7,6 @@ import { asyncRoutes } from '@/router'
 /**
  * 前置守卫
  */
-
 const whiteList = ['/login', '/404']
 router.beforeEach(async(to, from, next) => {
   nprogress.start()
