@@ -8,7 +8,7 @@
         <el-table-column label="描述" prop="description" />
         <el-table-column label="操作">
           <template v-slot="{ row }">
-            <el-button v-if="row.type === 1" size="mini" type="text">添加</el-button>
+            <el-button v-if="row.type === 1" size="mini" type="text" @click="addPermission(row.id, 2)">添加</el-button>
             <el-button size="mini" type="text" @click="editPermission(row.id)">编辑</el-button>
             <el-button size="mini" type="text" @click="delPermission(row.id)"> 删除</el-button>
           </template>
@@ -59,7 +59,7 @@ export default {
         description: '', // 描述
         type: '', // 类型 该类型 不需要显示 因为点击添加的时候已经知道类型了
         pid: '', // 因为做的是树 需要知道添加到哪个节点下了
-        enVisible: '0' // 默认关闭
+        enVisible: '0' // 开启
       },
       rules: {
         name: [{ required: true, message: '权限名称不能为空', trigger: 'blur' }],
@@ -105,7 +105,7 @@ export default {
         description: '', // 描述
         type: '', // 类型 该类型 不需要显示 因为点击添加的时候已经知道类型了
         pid: '', // 因为做的是树 需要知道添加到哪个节点下了
-        enVisible: '0' // 默认关闭
+        enVisible: '0' // 开启
       }
       this.$refs.perForm.resetFields()
       this.showDialog = false
@@ -127,6 +127,7 @@ export default {
       }
     }
   }
+
 }
 </script>
 <style>

@@ -13,7 +13,6 @@
               @archivingReportForm="archivingReportForm"
             />
           </el-tab-pane>
-
         </el-tabs>
       </el-card>
     </div>

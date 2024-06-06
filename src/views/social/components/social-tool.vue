@@ -14,7 +14,6 @@
           <el-checkbox v-for="item in cityList" :key="item" :label="item" @change="checkChange">{{ item }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
-
       <el-form-item label="公积金城市">
         <el-checkbox-group v-model="providentFundChecks" style="display:inline-block">
           <el-checkbox v-for="item in cityList" :key="item" :label="item" @change="checkChange">{{ item }}</el-checkbox>

@@ -149,10 +149,6 @@
               <!-- 图表 -->
               <div ref="social" style=" width: 100%; height:100% " />
             </div>
-            <div class="chart">
-              <!-- 图表 -->
-              <div ref="provident" style=" width: 100%; height:100% " />
-            </div>
           </div>
         </div>
         <!-- 图表数据 -->
@@ -197,6 +193,7 @@
             </div>
             <div class="chart">
               <!-- 图表 -->
+              <div ref="provident" style=" width: 100%; height:100% " />
             </div>
           </div>
         </div>
@@ -259,29 +256,31 @@
 import CountTo from 'vue-count-to'
 import { mapGetters } from 'vuex'
 import { getHomeData, getMessageList } from '@/api/home'
+// import * as echarts from 'echarts' // 引入所有的echarts
 import * as echarts from 'echarts/core' // 引入核心包
 import { LineChart } from 'echarts/charts' // 引入折线图
 import { GridComponent } from 'echarts/components' // 引入组件
 import { CanvasRenderer } from 'echarts/renderers'
+
 echarts.use([
   LineChart,
   GridComponent,
   CanvasRenderer
 ])
-
 export default {
   components: {
     CountTo
   },
   data() {
     return {
-      homeData: {}, // 存放首页数据的对象
+      homeData: {},
       list: []
     }
   },
   // 计算属性
   computed: {
-    ...mapGetters(['name', 'avatar', 'company', 'departmentName']) // 映射给了计算属性
+    // 将getters中的四个属性映射到计算属性中- 指向
+    ...mapGetters(['avatar', 'name', 'company', 'departmentName'])
   },
   watch: {
     homeData() {
@@ -339,9 +338,9 @@ export default {
   },
   mounted() {
     // 获取展示的数据 设置给图表
-    // 监听 homeData 的变化
-    this.social = echarts.init(this.$refs.social) // 初始化 echart
-    // data 中没有声明 不是响应式
+    // 监听homeData的变化
+    this.social = echarts.init(this.$refs.social) // 初始化echart
+    // data中没有声明 不是响应式
     this.provident = echarts.init(this.$refs.provident)
   },
   methods: {
