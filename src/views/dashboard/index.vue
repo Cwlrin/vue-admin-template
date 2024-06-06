@@ -147,6 +147,11 @@
             </div>
             <div class="chart">
               <!-- 图表 -->
+              <div ref="social" style=" width: 100%; height:100% " />
+            </div>
+            <div class="chart">
+              <!-- 图表 -->
+              <div ref="provident" style=" width: 100%; height:100% " />
             </div>
           </div>
         </div>
@@ -254,6 +259,15 @@
 import CountTo from 'vue-count-to'
 import { mapGetters } from 'vuex'
 import { getHomeData, getMessageList } from '@/api/home'
+import * as echarts from 'echarts/core' // 引入核心包
+import { LineChart } from 'echarts/charts' // 引入折线图
+import { GridComponent } from 'echarts/components' // 引入组件
+import { CanvasRenderer } from 'echarts/renderers'
+echarts.use([
+  LineChart,
+  GridComponent,
+  CanvasRenderer
+])
 
 export default {
   components: {
@@ -269,9 +283,66 @@ export default {
   computed: {
     ...mapGetters(['name', 'avatar', 'company', 'departmentName']) // 映射给了计算属性
   },
+  watch: {
+    homeData() {
+      console.log(this.homeData)
+      // 设置图表
+      this.social.setOption({
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: this.homeData.socialInsurance?.xAxis
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            data: this.homeData.socialInsurance?.yAxis,
+            type: 'line',
+            areaStyle: {
+              color: '#04c9be' // 填充颜色
+            },
+            lineStyle: {
+              color: '#04c9be' // 线的颜色
+            }
+          }
+        ]
+      })
+      this.provident.setOption({
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: this.homeData.providentFund?.xAxis
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            data: this.homeData.providentFund?.yAxis,
+            type: 'line',
+            areaStyle: {
+              color: '#04c9be' // 填充颜色
+            },
+            lineStyle: {
+              color: '#04c9be' // 线的颜色
+            }
+          }
+        ]
+      })
+    }
+  },
   created() {
     this.getHomeData()
     this.getMessageList()
+  },
+  mounted() {
+    // 获取展示的数据 设置给图表
+    // 监听 homeData 的变化
+    this.social = echarts.init(this.$refs.social) // 初始化 echart
+    // data 中没有声明 不是响应式
+    this.provident = echarts.init(this.$refs.provident)
   },
   methods: {
     async getHomeData() {
