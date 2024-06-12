@@ -1,23 +1,30 @@
 <template>
   <div class="login-container">
+    <!-- 登录界面容器 -->
     <div class="logo" />
+    <!-- 登录表单容器 -->
     <div class="form">
       <h1>登录</h1>
+      <!-- 登录卡片组件 -->
       <el-card class="login-card" shadow="never">
-        <!--登录表单-->
+        <!-- 登录表单 -->
         <!-- el-form > el-form-item > el-input -->
         <el-form ref="form" :model="loginForm" :rules="loginRules">
+          <!-- 手机号输入框 -->
           <el-form-item prop="mobile">
             <el-input v-model="loginForm.mobile" placeholder="请输入手机号" />
           </el-form-item>
+          <!-- 密码输入框 -->
           <el-form-item prop="password">
             <el-input v-model="loginForm.password" placeholder="请输入密码" show-password />
           </el-form-item>
+          <!-- 用户协议复选框 -->
           <el-form-item prop="isAgree">
             <el-checkbox v-model="loginForm.isAgree">
               用户平台使用协议
             </el-checkbox>
           </el-form-item>
+          <!-- 登录按钮 -->
           <el-form-item>
             <el-button style="width:350px" type="primary" @click="login">登录</el-button>
           </el-form-item>
@@ -26,16 +33,19 @@
     </div>
   </div>
 </template>
+
 <script>
 export default {
   name: 'Login',
   data() {
     return {
+      /* 登录表单数据 */
       loginForm: {
         mobile: process.env.NODE_ENV === 'development' ? '13800000002' : '',
         password: process.env.NODE_ENV === 'development' ? 'hm#qd@23!' : '',
         isAgree: process.env.NODE_ENV === 'development'
       },
+      /* 登录表单验证规则 */
       loginRules: {
         mobile: [{
           required: true,
@@ -61,6 +71,7 @@ export default {
         // required只能检测 null undefined ""
         isAgree: [{
           validator: (rule, value, callback) => {
+            /* 校验用户是否同意协议 */
             // rule校验规则
             // value 校验的值
             // callback 函数 - promise resolve reject
@@ -72,20 +83,29 @@ export default {
     }
   },
   methods: {
+    /**
+     * 执行登录操作。
+     * 此函数首先验证表单数据的有效性，如果表单数据验证通过，
+     * 则使用 Vuex 的 dispatch 方法提交登录动作，登录成功后跳转到首页。
+     *
+     * 使用 async/await 语法结构以异步方式处理登录过程，
+     * 以便于处理登录前后可能需要的异步逻辑。
+     */
+    /* 登录提交函数 */
     login() {
       this.$refs.form.validate(async(isOK) => {
+        /* 当表单验证通过时，执行登录动作 */
         if (isOK) {
           await this.$store.dispatch('user/login', this.loginForm)
-          // Vuex 中的action 返回的promise
-          // 跳转主页
+          /* 登录成功后跳转到首页 */
           this.$router.push('/')
         }
       })
     }
-
   }
 }
 </script>
+
 <style lang="scss">
 .login-container {
   display: flex;

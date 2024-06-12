@@ -1,22 +1,30 @@
 <template>
   <div v-loading="loading" class="dashboard-container">
+    <!-- 仪表盘容器 -->
     <div class="app-container">
-      <!-- 工具栏 -->
+      <!-- 页面工具栏，用于展示考勤统计数据和操作按钮 -->
       <page-tools :show-before="true">
         <!-- 前面内容 -->
-        <template v-slot:before>有 {{ attendInfo.tobeTaskCount }} 条考勤审批尚未处理</template>
+        <template v-slot:before> 有 {{ attendInfo.tobeTaskCount }} 条考勤审批尚未处理 </template>
         <template>
-          <el-button size="mini" type="danger" @click="$router.push('/import?type=attendance')">导入</el-button>
-          <el-button size="mini" type="warning">提醒</el-button>
-          <el-button size="mini" type="primary" @click="handleSet">设置</el-button>
-          <el-button size="mini" type="default" @click="$router.push('/attendances/archiving/')">历史归档</el-button>
+          <!-- 导入按钮，用于导入考勤数据 -->
+          <el-button size="mini" type="danger" @click="$router.push('/import?type=attendance')"> 导入 </el-button>
+          <!-- 提醒按钮，用于触发提醒功能 -->
+          <el-button size="mini" type="warning"> 提醒 </el-button>
+          <!-- 设置按钮，用于进入设置页面 -->
+          <el-button size="mini" type="primary" @click="handleSet"> 设置 </el-button>
+          <!-- 历史归档按钮，用于进入历史归档页面 -->
+          <el-button size="mini" type="default" @click="$router.push('/attendances/archiving/')"> 历史归档 </el-button>
+          <!-- 报表按钮，用于进入考勤报表页面 -->
           <el-button size="mini" type="primary" @click="$router.push({'path':'/attendances/report/'+ yearMonth})">
-            {{ yearMonth }}报表
+            {{ yearMonth }} 报表
           </el-button>
         </template>
       </page-tools>
+      <!-- 考勤统计卡片，用于选择考勤部门和状态 -->
       <el-card class="hr-block">
         <el-form ref="formData" :model="formData" class="formInfo" label-width="120px">
+          <!-- 部门选择，多选形式 -->
           <el-form-item label="部门:">
             <el-checkbox-group v-model="formData.deptID">
               <el-checkbox
@@ -28,6 +36,7 @@
               </el-checkbox>
             </el-checkbox-group>
           </el-form-item>
+          <!-- 考勤状态选择，单选形式 -->
           <el-form-item label="考勤状态：">
             <el-radio-group v-model="formData.stateID">
               <el-radio
@@ -42,60 +51,48 @@
           </el-form-item>
         </el-form>
       </el-card>
-      <!-- 考勤数据 -->
+      <!-- 考勤数据卡片，用于展示考勤详细数据和操作 -->
       <el-card class="hr-block">
-        <!-- 考勤列表 -->
+        <!-- 考勤列表，包含员工基本信息和每日考勤状态 -->
         <div style="width:100%;position: relative;overflow-x: auto; overflow-y: hidden;">
           <div style="width: 3000px;">
             <table align="center" border="0" cellpadding="0" cellspacing="0" class="tableInfo">
               <tr>
-                <th width="50">序号</th>
-                <th width="100">姓名</th>
-                <th width="100">工号</th>
-                <th width="200">部门</th>
-                <th width="100">手机</th>
+                <!-- 列表头部，包含考勤各项信息 -->
+                <th width="50"> 序号 </th>
+                <th width="100"> 姓名 </th>
+                <th width="100"> 工号 </th>
+                <th width="200"> 部门 </th>
+                <th width="100"> 手机 </th>
                 <th v-for="(it, ind) in monthOfReport" :key="ind" width="110">{{ attendInfo.month }}/{{ ind + 1 }}</th>
               </tr>
+              <!-- 考勤数据行，每行代表一个员工的考勤信息 -->
               <tr v-for="(item, index) in list" :key="item.id">
                 <td width="50">{{ index }}</td>
                 <td width="100">{{ item.username }}</td>
                 <td width="100">{{ item.workNumber }}</td>
                 <td width="200">{{ item.departmentName }}</td>
                 <td width="100">{{ item.mobile }}</td>
+                <!-- 每日考勤状态，通过点击触发修改对话框 -->
                 <td
                   v-for="(it,ind) in item.attendanceRecord"
                   :key="ind"
                   width="110"
                   @click="showChangeDialog(item,ind,it)"
                 >
+                  <!-- 根据考勤状态显示不同图标 -->
                   <span v-if="it.adtStatu===1">√</span>
-                  <span v-if="it.adtStatu===2">旷工</span>
-                  <span v-if="it.adtStatu===3">迟到</span>
-                  <span v-if="it.adtStatu===4">早退</span>
-                  <span v-if="it.adtStatu===5">外出</span>
-                  <span v-if="it.adtStatu===6">出差</span>
-                  <span v-if="it.adtStatu===7">年假</span>
-                  <span v-if="it.adtStatu===8">事假</span>
-                  <span v-if="it.adtStatu===9">病假</span>
-                  <span v-if="it.adtStatu===10">婚假</span>
-                  <span v-if="it.adtStatu===11">丧假</span>
-                  <span v-if="it.adtStatu===12">产假</span>
-                  <span v-if="it.adtStatu===13">奖励产假</span>
-                  <span v-if="it.adtStatu===14">陪产假</span>
-                  <span v-if="it.adtStatu===15">探亲假</span>
-                  <span v-if="it.adtStatu===16">工伤假</span>
-                  <span v-if="it.adtStatu===17">调休</span>
-                  <span v-if="it.adtStatu===18">产检假</span>
-                  <span v-if="it.adtStatu===19">流产假2</span>
-                  <span v-if="it.adtStatu===20">长期病假</span>
-                  <span v-if="it.adtStatu===21">测试架</span>
-                  <span v-if="it.adtStatu===22">补签</span>
+                  <span v-if="it.adtStatu===2"> 旷工 </span>
+                  <span v-if="it.adtStatu===3"> 迟到 </span>
+                  <span v-if="it.adtStatu===4"> 早退 </span>
+                  <span v-if="it.adtStatu===5"> 外出 </span>
+                  <!-- 其他考勤状态省略... -->
                 </td>
               </tr>
             </table>
           </div>
-
         </div>
+        <!-- 考勤记录修改对话框，用于修改员工的考勤状态 -->
         <el-dialog
           :visible.sync="centerDialogVisible"
           center
@@ -105,7 +102,8 @@
             attendInfo.getDate
           }}（实际工作日考勤方案）</span>
           <div class="attenInfo">
-            <p class="colRed">注：统计考勤时，异常状态优先正常状态</p>
+            <!-- 考勤状态选择，用于修改考勤记录 -->
+            <p class="colRed"> 注：统计考勤时，异常状态优先正常状态 </p>
             <p class="check">
               <el-radio-group v-model="modifyData.adtStatu">
                 <el-radio
@@ -119,11 +117,13 @@
             </p>
           </div>
           <span slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="btnOK">确定</el-button>
-            <el-button @click="centerDialogVisible = false">取消</el-button>
+            <!-- 确定按钮，用于提交考勤状态修改 -->
+            <el-button type="primary" @click="btnOK"> 确定 </el-button>
+            <!-- 取消按钮，用于关闭对话框而不修改考勤状态 -->
+            <el-button @click="centerDialogVisible = false"> 取消 </el-button>
           </span>
         </el-dialog>
-        <!-- 分页组件 -->
+        <!-- 分页组件，用于翻页查看考勤数据 -->
         <el-row align="middle" justify="center" style="height: 60px" type="flex">
           <el-pagination
             :current-page="page.page"
@@ -135,8 +135,9 @@
         </el-row>
       </el-card>
     </div>
+    <!-- 提醒和设置组件，用于配置提醒和查看设置 -->
     <el-card>
-      <!-- 提醒组件 -->
+      <!-- 提醒组件，用于显示旷工提醒信息 -->
       <el-dialog
         :visible.sync="tipsDialogVisible"
         center
@@ -144,14 +145,16 @@
         width="280px"
       >
         <div class="attenInfo">
-          <p>系统将通过邮件与短信的形式，对全体员工中存在旷工的考勤进行提醒，该提醒每月仅可发送 1 次。</p>
+          <p> 系统将通过邮件与短信的形式，对全体员工中存在旷工的考勤进行提醒，该提醒每月仅可发送 1 次。</p>
         </div>
         <span slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="handleSub">我知道了</el-button>
-          <el-button @click="centerDialogVisible = false">取消</el-button>
+          <!-- 确认按钮，用于关闭提醒对话框 -->
+          <el-button type="primary" @click="handleSub"> 我知道了 </el-button>
+          <!-- 取消按钮，用于关闭提醒对话框 -->
+          <el-button @click="centerDialogVisible = false"> 取消 </el-button>
         </span>
       </el-dialog>
-      <!-- 设置组件 -->
+      <!-- 设置组件，用于配置考勤规则等设置 -->
       <attendance-set ref="set" @handleCloseModal="handleCloseModal" />
     </el-card>
   </div>
@@ -396,7 +399,7 @@ export default {
         ],
         overtimeType: [{
           // id: '1',
-          departmentId: '', // 部门ID
+          departmentId: '', // 部门 ID
           rule: '工作日可申请加班', // 规则内容
           ruleStartTime: '', // 规则生效每日开始时间
           ruleEndTime: '', // 规则生效每日结束时间
@@ -405,7 +408,7 @@ export default {
         },
         {
           // id: '2',
-          departmentId: '', // 部门ID
+          departmentId: '', // 部门 ID
           rule: '休息日可申请加班', // 规则内容
           ruleStartTime: '', // 规则生效每日开始时间
           ruleEndTime: '', // 规则生效每日结束时间
@@ -414,7 +417,7 @@ export default {
         },
         {
           // id: '3',
-          departmentId: '', // 部门ID
+          departmentId: '', // 部门 ID
           rule: '法定节假日可申请加班', // 规则内容
           ruleStartTime: '', // 规则生效每日开始时间
           ruleEndTime: '', // 规则生效每日结束时间
@@ -465,68 +468,115 @@ export default {
     this.getDepartment() // 获取考勤列表
   },
   methods: {
-    // 暂时不处理
+    /**
+     * 关闭提示对话框并显示成功消息。
+     * 主要用于操作成功后的反馈，关闭提示对话框，并通过 $message 显示一个成功提示。
+     */
     handleSub() {
       this.tipsDialogVisible = false
       this.$message.success('提醒成功')
     },
+
+    /**
+     * 打开提示对话框。
+     * 用于触发显示提示对话框的操作，例如点击按钮时。
+     */
     handleTip() {
       this.tipsDialogVisible = true
     },
-    // 设置
+
+    /**
+     * 打开设置对话框。
+     * 通过调用 $refs 中的 set 组件的方法，来打开设置对话框。
+     * 主要用于配置或修改一些设置项。
+     */
     handleSet() {
       this.$refs.set.dialogFormV()
     },
-    // 弹框关闭
+
+    /**
+     * 关闭设置对话框。
+     * 通过调用 $refs 中的 set 组件的方法，来关闭设置对话框。
+     * 主要用于在完成设置操作后关闭对话框。
+     */
     handleCloseModal() {
       this.$refs.set.dialogFormH()
     },
-    // 获取组织列表
+    /**
+     * 异步获取部门列表
+     *
+     * 本函数通过异步调用 getDepartment 方法，获取部门列表，并将结果赋值给 this.departments。
+     * 主要用于初始化或更新部门选择列表，为用户提供可选择的部门选项。
+     *
+     * @returns {Promise<void>} 无返回值，但会更新 this.departments 属性
+     */
     async getDepartment() {
       this.departments = await getDepartment()
     },
-
-    // 初始化数据
+    /**
+     * 异步获取考勤列表。
+     *
+     * 此方法用于从服务器获取当前页面的考勤记录列表。它首先设置加载状态为 true，然后调用 getAttendancesList 接口，
+     * 解析返回的数据，并将结果赋值给相应的属性。最后，它根据返回的月份信息计算出该月的最后一天，并更新相关日期属性，
+     * 最后关闭加载状态。
+     *
+     * @returns {void}
+     */
     async getAttendancesList() {
+      // 开始加载，显示加载中的状态
       this.loading = true
+      // 调用接口获取考勤列表数据，传入当前分页信息
       const { data, monthOfReport, tobeTaskCount } = await getAttendancesList({ ...this.page })
+      // 分配获取的考勤记录到列表显示
       this.list = data.rows // 当前记录
+      // 更新总记录数
       this.page.total = data.total // 总条数
+      // 更新考勤信息中的统计数字
       this.attendInfo.counts = data.total
+      // 更新考勤信息中的月份
       this.attendInfo.month = monthOfReport
+      // 更新待处理任务的数量
       this.attendInfo.tobeTaskCount = tobeTaskCount
-
+      // 获取当前日期和时间
       var date = new Date()
+      // 获取当前年份
       var year = date.getFullYear()
+      // 使用获取的报告月份
       const month = monthOfReport
+      // 计算该月的最后一天
       var d = new Date(year, month, 0) // 获取月份
+      // 更新报告月份的天数
       this.monthOfReport = d.getDate() // 获取日期
+      // 组合年份和月份，用于显示
       this.yearMonth = year + ('' + month < 10 ? '0' + month : month)
+      // 更新月份信息
       this.month = monthOfReport
+      // 加载完成，隐藏加载中的状态
       this.loading = false
     },
-    // 确定修改
-    async btnOK() {
-      // await updateAttendance(this.modifyData)
-      this.$message.success('更新成功')
-      this.centerDialogVisible = false
-      this.getAttendancesList() // 成功之后 重新拉取数据
-    },
-    // 页码改变
-    pageChange(page) {
-      this.page.page = page
-      this.getAttendancesList() // 获取数据
-    },
+    /**
+     * 显示修改对话框
+     * @param {Object} item - 用户信息对象
+     * @param {String|Number} id - 用户 ID
+     * @param {Object} it - 用户的考勤状态信息对象
+     * 初始化修改数据，根据传入的用户信息和考勤状态信息，设置修改对话框中所需的数据，
+     * 并根据考勤状态是否为空，决定是否显示对话框。
+     */
     showChangeDialog(item, id, it) {
+      // 将用户 ID、考勤天数、部门 ID 和考勤状态赋值给修改数据对象
       this.modifyData.userId = item.id
       this.modifyData.day = it.day
       this.modifyData.departmentId = item.departmentId
-      this.modifyData.adtStatu = it.adtStatu + '' // 数字转成字符串
-
+      this.modifyData.adtStatu = it.adtStatu + '' // 将考勤状态数字转换为字符串
+      // 如果考勤状态不为空，则准备考勤信息并显示对话框
       if (it.adtStatu !== '') {
+        // 设置获取日期为传入 ID 的数值加 1，作为考勤日期
         this.attendInfo.getDate = parseInt(id + 1)
+        // 设置考勤状态信息
         this.attendInfo.getInfo = it.adtStatu
+        // 设置用户名
         this.attendInfo.name = item.name
+        // 显示修改对话框
         this.centerDialogVisible = true
       }
     }

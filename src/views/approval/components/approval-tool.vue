@@ -1,14 +1,6 @@
 <template>
   <div class="cont-top-box">
-    <!-- <div class="top-lable">
-      <div class="careful-lab"> <i class="el-icon-info" />当前审批中 0 本月审批通过 1 本月审批驳回 0</div>
-      <div class="lable-tit">
-        <el-button type="primary" size="mini">
-          <router-link :to="{'path':'/approvals/securitySetting'}">流程设置</router-link>
-
-        </el-button>
-      </div>
-    </div> -->
+    <!-- 弹窗，用于导出审批数据 -->
     <el-dialog :visible.sync="exportData" title="导出" width="500px">
       <div class="exportTit"> 如果导出每月数据过多，请使用筛选功能后导出</div>
       <div class="exportCont">
@@ -20,6 +12,7 @@
         <el-button type="primary" @click="exportDataAct()">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 动态组件，根据不同的审批流程渲染不同的组件 -->
     <component :is="process" ref="set" @handleCloseModal="handleCloseModal" />
   </div>
 </template>
@@ -35,14 +28,15 @@ export default {
   },
   data() {
     return {
-      process: 'process',
-      exportData: false,
-      searchKey: '',
-      value: '',
-      dataes: ''
+      process: 'process', // 审批流程组件名称
+      exportData: false, // 导出对话框的可见性
+      searchKey: '', // 搜索关键字
+      value: '', // 选择的导出月份
+      dataes: '' // 数据列表
     }
   },
   methods: {
+    // 导出审批数据
     exportDataAct() {
       if (!this.value) {
         this.$message.success('请选择导出时间！')
@@ -52,10 +46,11 @@ export default {
         })
       }
     },
+    // 处理流程设置
     handlSet() {
       this.$refs.set.dialogFormV()
     },
-    // 弹框关闭
+    // 关闭弹框
     handleCloseModal() {
       this.$refs.addUser.dialogFormH()
       this.$refs.positive.dialogFormH()

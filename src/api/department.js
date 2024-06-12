@@ -2,6 +2,8 @@ import request from '@/utils/request'
 
 /**
  * 获取组织架构数据
+ *
+ * @returns {Promise} 返回包含组织架构数据的 Promise 对象
  */
 export function getDepartment() {
   return request({
@@ -10,7 +12,9 @@ export function getDepartment() {
 }
 
 /**
- * 获取部门负责人的数据
+ * 获取部门负责人数据
+ *
+ * @returns {Promise} 返回包含部门负责人信息的 Promise 对象
  */
 export function getManagerList() {
   return request({
@@ -19,7 +23,10 @@ export function getManagerList() {
 }
 
 /**
- * 新增组织
+ * 新增组织部门
+ *
+ * @param {Object} data 部门相关信息
+ * @returns {Promise} 返回操作结果的 Promise 对象
  */
 export function addDepartment(data) {
   return request({
@@ -28,7 +35,10 @@ export function addDepartment(data) {
 }
 
 /**
- * 获取部门详情
+ * 获取部门详细信息
+ *
+ * @param {String} id 部门 ID
+ * @returns {Promise} 返回包含部门详细信息的 Promise 对象
  */
 export function getDepartmentDetail(id) {
   return request({
@@ -37,7 +47,10 @@ export function getDepartmentDetail(id) {
 }
 
 /**
- * 更新部门
+ * 更新部门信息
+ *
+ * @param {Object} data 需要更新的部门信息
+ * @returns {Promise} 返回操作结果的 Promise 对象
  */
 export function updateDepartment(data) {
   return request({
@@ -46,7 +59,10 @@ export function updateDepartment(data) {
 }
 
 /**
- * 删除部门
+ * 删除指定部门
+ *
+ * @param {String} id 部门 ID
+ * @returns {Promise} 返回操作结果的 Promise 对象
  */
 export function delDepartment(id) {
   return request({

@@ -1,8 +1,12 @@
 <template>
+  <!-- 员工历史归档组件 -->
   <div class="historicalArcBox">
+    <!-- 顶部区域，包含年份选择器 -->
     <div class="historicalArcTop">
       <div class="title">
-        <span>员工历史归档</span>
+        <!-- 标题 -->
+        <span> 员工历史归档 </span>
+        <!-- 年份选择器 -->
         <div class="yearChange">
           <el-date-picker
             v-model="yearVal"
@@ -16,48 +20,59 @@
         </div>
       </div>
     </div>
+    <!-- 数据展示区域，使用 Loading 效果 -->
     <div v-loading="loading" class="historicalTable">
-      <div v-show="showArchivig" class="archivig">该年份无归档报表</div>
-      <div v-for="( itemes, index) in tableData" :key="index" class="itemes">
+      <!-- 当年份无归档数据时的提示 -->
+      <div v-show="showArchivig" class="archivig"> 该年份无归档报表 </div>
+      <!-- 遍历展示每个月的归档数据 -->
+      <div v-for="(itemes, index) in tableData" :key="index" class="itemes">
+        <!-- 每个月的统计数据项 -->
         <div :class="{act: itemes.act}" class="itemTopLab">
+          <!-- 展开按钮 -->
           <div class="lab" @click="openTable(itemes,index)">
             >
           </div>
+          <!-- 标题和考勤统计标签 -->
           <div>
-            <p ref="sheelName" class="title">{{ itemes.archiveYear }}-{{ itemes.archiveMonth }}月员工报表</p>
-            <p class="labTit" @click="openTable(itemes,index)">考勤统计</p>
+            <p ref="sheelName" class="title">{{ itemes.archiveYear }}-{{ itemes.archiveMonth }} 月员工报表 </p>
+            <p class="labTit" @click="openTable(itemes,index)"> 考勤统计 </p>
           </div>
+          <!-- 总人数和全勤人数统计 -->
           <div class="fr">
             <div>
               <p class="itemTit">
-                <span>总人数</span>
+                <span> 总人数 </span>
               </p>
               <p class="itemNum">{{ itemes.totalPeopleNum }}</p>
             </div>
             <div>
               <p class="itemTit">
-                <span>全勤人数</span>
+                <span> 全勤人数 </span>
               </p>
               <p class="itemNum">{{ itemes.fullAttePeopleNum }}</p>
             </div>
           </div>
         </div>
+        <!-- 展开的详细数据区域 -->
         <div v-show="itemes.act" class="itemDropDown">
+          <!-- 警告提示，说明统计单位 -->
           <el-alert
             :closable="false"
             show-icon
             title="迟到、早退和补签的统计单位为“次”；所有假期类型、外出、旷工的统计单位均为“天”。"
             type="warning"
           />
+          <!-- 导出按钮 -->
           <div class="topLab">
             <div class="rightLabBox">
               <a
                 class="el-button fr el-button--primary el-button--mini"
                 title="导出"
                 @click="handleExport(index)"
-              >导出</a>
+              > 导出 </a>
             </div>
           </div>
+          <!-- 数据表格，展示详细考勤数据 -->
           <el-table
             id="item"
             :data="contentData"
@@ -65,6 +80,7 @@
             height="300"
             style="width: 100%;text-align: center"
           >
+            <!-- 表格列定义 -->
             <el-table-column label="姓名" prop="name" width="120" />
             <el-table-column label="工号" prop="workNumber" width="100" />
             <el-table-column label="手机号" prop="mobile" width="200" />
@@ -150,13 +166,25 @@ export default {
     }
   },
   computed: {
-    // 模糊搜索
+    /**
+     * 根据关键字搜索表格内容。
+     *
+     * 该方法用于模糊匹配表格数据中的内容，根据提供的关键字搜索所有表格行的数据。
+     * 如果关键字存在，则筛选出包含关键字的行数据；如果关键字不存在，则返回所有行的数据。
+     *
+     * @returns {null|Array} 返回匹配的表格数据，如果没有关键字则返回所有数据；如果没有匹配的数据，则返回 null。
+     */
     tables() {
+      // 获取搜索关键字
       const search = this.baseData.keyword
+      // 遍历表格数据
       for (var i = 0; i < this.tableData.length; i++) {
+        // 如果存在关键字
         if (search) {
+          // 筛选当前行中包含关键字的 contentData
           this.tableData[i].contentData.filter(data => {
             return Object.keys(data).some(key => {
+              // 检查数据的每个键值是否包含关键字，忽略大小写
               return (
                 String(data[key])
                   .toLowerCase()
@@ -165,9 +193,11 @@ export default {
             })
           })
         } else {
+          // 如果没有关键字，直接返回当前行的所有 contentData
           return this.tableData[i].contentData
         }
       }
+      // 如果遍历完成后没有返回数据，表示没有匹配的关键字或数据，返回 null
       return null
     }
   },
@@ -178,33 +208,59 @@ export default {
     this.getDepartment()
   },
   methods: {
+    /**
+     * 获取上一个月的日期信息
+     * 该函数用于计算当前日期的上一个月，以确保在日历中正确显示上一个月的日期。
+     * 它返回一个对象，包含上一个月的年份、月份和日期字符串。
+     *
+     * @returns {Object} 返回一个对象，包含 preDates（上一个月的日期字符串）、preYear（上一个月的年份）、preMonth（上一个月的月份）
+     */
     getMonth: function() {
+      /* 获取当前日期 */
       /* 默认显示上个月的日期 */
       var nowdays = new Date()
+      /* 解析当前日期的年份和月份 */
       var year = nowdays.getFullYear()
       var month = nowdays.getMonth()
+      /* 如果当前月份为 1 月，则将月份设置为 12，年份减一，以计算上一年的 12 月 */
       if (month === 0) {
         month = 12
         year = year - 1
       }
+      /* 如果月份小于 10，添加前导 0，以确保日期字符串的正确格式 */
       if (month < 10) {
         month = '0' + month
       }
+      /* 记录上一个月的年份 */
       var preYear = year // 年
+      /* 构造上一个月的日期字符串，格式为 YYYY-MM */
       var preDates = year + '-' + month // 上个月
+      /* 记录上一个月的月份 */
       var preMonth = month // 上个月
+      /* 月份自增用于后续逻辑，确保月份始终向前推进 */
       month++
+      /* 返回上一个月的日期信息 */
       return {
         preDates: preDates,
         preYear: preYear,
         preMonth: preMonth
       }
     },
+    /**
+     * 根据状态码返回相应的标准文本。
+     * @param {number} state - 状态码。
+     * @returns {string} - 状态的文本描述。
+     */
     fStandards(state) {
+      // 将状态码转换为文本描述
       return state === 0 ? '是' : '否'
     },
+    /**
+     * 异步获取归档列表。
+     * @param {Object} params - 请求参数。
+     */
     async getArchivingList(params) {
-      this.tableData = await getArchivingList(params)
+      await getArchivingList(params)
       if (this.tableData.length === 0) {
         this.showArchivig = true
       } else {
@@ -212,13 +268,19 @@ export default {
       }
       this.loading = false
     },
-    // 部门
+    /**
+     * 异步获取部门列表，并初始化归档列表。
+     */
     async getDepartment() {
       this.departmentData = await getDepartment()
       this.requestParameters.departmentId = this.departmentData[0].id
       this.getArchivingList(this.requestParameters)
     },
-    // 获取列表
+    /**
+     * 根据传入的对象和索引，打开相应的表格项，并加载其内容。
+     * @param {Object} obj - 表格项对象。
+     * @param {number} index - 表格项索引。
+     */
     async openTable(obj, index) {
       this.baseData.atteArchiveMonthlyId = obj.id
       if (!obj.act) {
@@ -229,19 +291,33 @@ export default {
         this.$set(this.tableData[index], 'act', false)
       }
     },
-    // 下载文件
+    /**
+     * 处理文件导出操作。
+     * @param {number} index - 表格项索引。
+     */
     handleExport(index) {
-
     },
-    // 选择部门
+    /**
+     * 当部门选择发生变化时的处理函数。
+     * @param {any} val - 新选中的部门值。
+     */
     handleChange(val) {
       this.requestParameters.departmentId = val
       this.init(this.requestParameters)
     },
-    // 选择年份
+    /**
+     * 当选择年份发生变化时的处理函数。
+     * 主要用于更新查询参数中的年份，并根据查询结果决定是否显示无数据提示。
+     *
+     * 修改年份选择后，首先更新请求参数中的年份值，然后发起获取归档列表的请求。
+     * 如果获取的表格数据为空，则显示无数据提示；否则，隐藏无数据提示。
+     */
     handleChangeYear() {
+      // 更新请求参数中的年份
       this.requestParameters.year = this.yearVal
+      // 发起获取归档列表的请求
       this.getArchivingList(this.requestParameters)
+      // 根据表格数据长度判断是否显示无数据提示
       if (this.tableData.length === 0) {
         this.showArchivig = true
       } else {
@@ -251,6 +327,7 @@ export default {
   }
 }
 </script>
+
 <style lang="scss" rel="stylesheet/scss" scoped>
 @import "./../../styles/variables.scss";
 

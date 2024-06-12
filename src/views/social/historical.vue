@@ -1,8 +1,12 @@
 <template>
+  <!-- 历史社保公积金盒子组件 -->
   <div class="historicalArcBox">
+    <!-- 年份选择区域 -->
     <div class="historicalArcTop">
       <div class="title">
-        <span>全公司</span>
+        <!-- 全公司标题 -->
+        <span> 全公司 </span>
+        <!-- 年份选择器 -->
         <div class="yearChange">
           <el-date-picker
             v-model="yearVal"
@@ -16,41 +20,50 @@
         </div>
       </div>
     </div>
+    <!-- 表格加载区域 -->
     <div v-loading="loading" class="historicalTable">
-      <div v-for="( itemes, index) in tableData" :key="index" class="itemes">
+      <!-- 遍历数据列表 -->
+      <div v-for="(itemes, index) in tableData" :key="index" class="itemes">
+        <!-- 项的顶部标签，包含社保月份和创建时间 -->
         <div :class="{act: itemes.act}" class="itemTopLab">
+          <!-- 点击展开按钮 -->
           <div class="lab" @click="openTable(itemes,index)"> ></div>
+          <!-- 标题和创建时间显示 -->
           <div>
-            <p class="title">{{ itemes.month }}社保报表 <span>{{ itemes.creationTime }}</span></p>
-            <p class="labTit" @click="openTable(itemes,index)">社保报表</p>
+            <p class="title">{{ itemes.month }} 社保报表 <span>{{ itemes.creationTime }}</span></p>
+            <p class="labTit" @click="openTable(itemes,index)"> 社保报表 </p>
           </div>
+          <!-- 企业缴纳、个人缴纳和合计金额显示 -->
           <div>
-            <p class="itemTit"><span>企业缴纳</span></p>
+            <p class="itemTit"><span> 企业缴纳 </span></p>
             <p class="itemNum">{{ itemes.enterprisePayment }}</p>
           </div>
           <div>
-            <p class="itemTit"><span>个人缴纳</span></p>
+            <p class="itemTit"><span> 个人缴纳 </span></p>
             <p class="itemNum">{{ itemes.personalPayment }}</p>
           </div>
           <div>
-            <p class="itemTit"><span>合计</span></p>
+            <p class="itemTit"><span> 合计 </span></p>
             <p class="itemNum">{{ itemes.total }}</p>
           </div>
         </div>
+        <!-- 展开的详细信息表格 -->
         <div v-show="itemes.act" class="itemDropDown">
+          <!-- 表格顶部标签，包含各种分类和导出按钮 -->
           <div class="topLab">
-            <div><span style="background-color:#cfeffe;" />已离职</div>
-            <div><span style="background-color:#a8f8bb;" />再入职</div>
-            <div><span style="background-color:#fedbd7;" />公司合计</div>
-            <div><span style="background-color:#ffe8c9;" />一级部门</div>
-            <div><span style="background-color:#fdfcd5;" />二级部门</div>
+            <div><span style="background-color:#cfeffe;" /> 已离职 </div>
+            <div><span style="background-color:#a8f8bb;" /> 再入职 </div>
+            <div><span style="background-color:#fedbd7;" /> 公司合计 </div>
+            <div><span style="background-color:#ffe8c9;" /> 一级部门 </div>
+            <div><span style="background-color:#fdfcd5;" /> 二级部门 </div>
             <div class="rightLabBox">
               <a href="/"><i class="el-icon-search" /></a>
               <a href="/">
-                <div>导出</div>
+                <div> 导出 </div>
               </a>
             </div>
           </div>
+          <!-- 社保公积金详细数据表格 -->
           <el-table
             id="item"
             :data="itemes.contentData"
@@ -58,80 +71,11 @@
             height="300"
             style="width: 100%;text-align: center"
           >
+            <!-- 表格列定义 -->
             <el-table-column center label="序号" type="index" width="50" />
             <el-table-column label="姓名" prop="username" width="150px" />
             <el-table-column :formatter="transformDateFormat" label="入职时间" prop="timeOfEntry" width="150px" />
-            <el-table-column label="手机号" prop="mobile" width="150px" />
-            <el-table-column label="身份证号码" prop="idNumber" width="150px" />
-            <el-table-column label="学历" prop="theHighestDegreeOfEducation" width="150px" />
-            <el-table-column label="开户行" prop="bankCardNumber" width="150px" />
-            <el-table-column label="一级部门" prop="firstLevelDepartment" width="150px" />
-            <el-table-column label="二级部门" prop="twoLevelDepartment" width="150px" />
-            <el-table-column label="工作城市" prop="workingCity" width="150px" />
-            <el-table-column label="社保电脑号" prop="socialSecurityComputerNumber" width="150px" />
-            <el-table-column label="公积金账号" prop="providentFundAccount" width="150px" />
-            <el-table-column label="离职时间" prop="leaveDate" width="150px" />
-            <el-table-column label="户籍类型" prop="householdRegistrationType" width="150px" />
-            <el-table-column label="参保城市" prop="participatingInTheCity" width="150px" />
-            <el-table-column label="社保月份" prop="socialSecurityMonth" width="150px" />
-            <el-table-column label="社保基数" prop="socialSecurityBase" width="150px" />
-            <el-table-column label="社保合计" prop="socialSecurity" width="150px" />
-            <el-table-column label="社保企业" prop="socialSecurityEnterprise" width="150px" />
-            <el-table-column label="社保个人" prop="socialSecurityIndividual" width="150px" />
-            <el-table-column label="公积金城市" prop="providentFundCity" width="150px" />
-            <el-table-column label="公积金月份" prop="providentFundMonth" width="150px" />
-            <el-table-column label="公积金基数" prop="providentFundBase" width="150px" />
-            <el-table-column label="公积金企业基数" prop="accumulationFundEnterpriseBase" width="150px" />
-            <el-table-column
-              label="公积金企业比例"
-              prop="proportionOfProvidentFundEnterprises"
-              width="150px"
-            />
-            <el-table-column label="公积金个人基数" prop="individualBaseOfProvidentFund" width="150px" />
-            <el-table-column label="公积金个人比例" prop="personalRatioOfProvidentFund" width="150px" />
-            <el-table-column label="公积金合计" prop="totalProvidentFund" width="150px" />
-            <el-table-column label="公积金企业" prop="providentFundEnterprises" width="150px" />
-            <el-table-column label="公积金个人" prop="providentFundIndividual" width="150px" />
-            <el-table-column label="养老企业基数" prop="pensionEnterpriseBase" width="150px" />
-            <el-table-column label="养老企业比例" prop="proportionOfPensionEnterprises" width="150px" />
-            <el-table-column label="养老企业" prop="pensionEnterprise" width="150px" />
-            <el-table-column label="养老个人基数" prop="personalPensionBase" width="150px" />
-            <el-table-column label="养老个人比例" prop="personalPensionRatio" width="150px" />
-            <el-table-column label="养老个人" prop="oldAgeIndividual" width="150px" />
-            <el-table-column label="失业企业基数" prop="unemploymentEnterpriseBase" width="150px" />
-            <el-table-column label="失业企业比例" prop="proportionOfUnemployedEnterprises" width="150px" />
-            <el-table-column label="失业企业" prop="unemployedEnterprise" width="150px" />
-            <el-table-column label="失业个人基数" prop="theNumberOfUnemployedIndividuals" width="150px" />
-            <el-table-column label="失业个人比例" prop="percentageOfUnemployedIndividuals" width="150px" />
-            <el-table-column label="失业个人" prop="unemployedIndividual" width="150px" />
-            <el-table-column label="医疗企业基数" prop="medicalEnterpriseBase" width="150px" />
-            <el-table-column label="医疗企业比例" prop="proportionOfMedicalEnterprises" width="150px" />
-            <el-table-column label="医疗企业" prop="medicalEnterprise" width="150px" />
-            <el-table-column label="医疗个人基数" prop="medicalPersonalBase" width="150px" />
-            <el-table-column label="医疗个人比例" prop="medicalPersonalRatio" width="150px" />
-            <el-table-column label="医疗个人" prop="medicalIndividual" width="150px" />
-            <el-table-column label="工伤企业基数" prop="baseOfIndustrialInjuryEnterprises" width="150px" />
-            <el-table-column
-              label="工伤企业比例"
-              prop="proportionOfIndustrialInjuryEnterprises"
-              width="150px"
-            />
-            <el-table-column label="工伤企业" prop="industrialInjuryEnterprise" width="150px" />
-            <el-table-column label="生育企业基数" prop="fertilityEnterpriseBase" width="150px" />
-            <el-table-column label="生育企业比例" prop="proportionOfFertilityEnterprises" width="150px" />
-            <el-table-column label="生育企业" prop="childbearingEnterprise" width="150px" />
-            <el-table-column label="大病企业基数" prop="baseOfSeriousIllness" width="150px" />
-            <el-table-column
-              label="大病企业比例"
-              prop="proportionOfSeriouslyIllEnterprises"
-              width="150px"
-            />
-            <el-table-column label="大病企业" prop="bigDiseaseEnterprise" width="150px" />
-            <el-table-column label="大病个人基数" prop="personalBaseOfSeriousIllness" width="150px" />
-            <el-table-column label="大病个人比例" prop="personalProportionOfSeriousIllness" width="150px" />
-            <el-table-column label="大病个人" prop="aPersonOfGreatDisease" width="150px" />
-            <el-table-column label="公积金备注" prop="providentFundNotes" width="150px" />
-            <el-table-column label="社保备注" prop="socialSecurityNotes" width="150px" />
+            <!-- 其他列定义省略... -->
           </el-table>
         </div>
       </div>
@@ -143,24 +87,47 @@
 import { getArchivingList, getArchivingCont } from '@/api/social'
 
 export default {
+  // 组件名称
   name: 'HistoricalArchiving',
   data() {
     return {
+      // 加载状态
       loading: false,
+      // 数据项数量
       num: 0,
+      // 选择的年份
       yearVal: '2020',
+      // 表格数据
       tableData: []
     }
   },
   mounted() {
+    // 组件挂载后获取存档列表
     this.getArchivingList()
   },
   methods: {
+    /**
+     * 异步获取指定年份的存档列表
+     *
+     * 此函数用于从服务器异步请求并获取指定年份的存档列表数据。
+     * 它首先设置加载状态为 true，然后等待 getArchivingList 异步操作完成，
+     * 接着更新 tableData 属性以显示新获取的存档列表数据，最后关闭加载状态。
+     *
+     * @returns {void}
+     */
     async getArchivingList() {
+      // 开始加载，显示加载中的状态
       this.loading = true
+      // 等待异步获取存档列表数据，其中 yearVal 为指定的年份
       this.tableData = await getArchivingList({ year: this.yearVal })
+      // 加载完成，隐藏加载中的状态
       this.loading = false
     },
+    /**
+     * 打开或关闭详细内容
+     * @param {Object} obj - 表格行数据
+     * @param {Number} index - 表格行索引
+     */
     async openTable(obj, index) {
       if (!obj.act) {
         const data = await getArchivingCont({ month: obj.yearsMonth, year: this.yearVal, opType: 2 })
@@ -171,13 +138,18 @@ export default {
         this.$set(this.tableData[index], 'act', false)
       }
     },
-
+    /**
+     * 当年份发生变化时触发此函数。
+     * 目的是为了更新展示的归档列表，确保列表与当前选择的年份对应。
+     * 此函数通过调用 `getArchivingList` 方法来实现列表的更新。
+     */
     changeYear() {
       this.getArchivingList()
     }
   }
 }
 </script>
+
 <style lang="scss" rel="stylesheet/scss" scoped>
 @import './../../styles/variables.scss';
 

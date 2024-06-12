@@ -1,22 +1,28 @@
 <template>
+  <!-- 月度社保公积金报表容器 -->
   <div class="monthStatementBox">
+    <!-- 报表头部，包含标题 -->
     <div class="monthStatementTop">
       <div class="title">
-        <span>社保报表</span>
+        <span> 社保报表 </span>
       </div>
     </div>
+    <!-- 表格区域，展示详细的社保公积金信息 -->
     <div class="monthStatementTable">
       <div class="itemDropDown">
+        <!-- 表头，显示各类统计数据的分类 -->
         <div class="topLab">
-          <div><span style="background-color:#cfeffe;" />已离职</div>
-          <div><span style="background-color:#a8f8bb;" />再入职</div>
-          <div><span style="background-color:#fedbd7;" />公司合计</div>
-          <div><span style="background-color:#ffe8c9;" />一级部门</div>
-          <div><span style="background-color:#fdfcd5;" />二级部门</div>
+          <div><span style="background-color:#cfeffe;" /> 已离职 </div>
+          <div><span style="background-color:#a8f8bb;" /> 再入职 </div>
+          <div><span style="background-color:#fedbd7;" /> 公司合计 </div>
+          <div><span style="background-color:#ffe8c9;" /> 一级部门 </div>
+          <div><span style="background-color:#fdfcd5;" /> 二级部门 </div>
+          <!-- 导出按钮 -->
           <div class="rightLabBox">
-            <el-button size="small" type="primary">导出</el-button>
+            <el-button size="small" type="primary"> 导出 </el-button>
           </div>
         </div>
+        <!-- 数据表格，展示员工的社保公积金详细信息 -->
         <el-table
           v-loading="loading"
           :data="contentData"
@@ -26,6 +32,7 @@
           highlight-current-row
           style="width: 100%;text-align: center"
         >
+          <!-- 表格列定义 -->
           <el-table-column center label="序号" type="index" width="50" />
           <el-table-column label="姓名" prop="username" width="150px" />
           <el-table-column :formatter="transformDateFormat" label="入职时间" prop="timeOfEntry" width="150px" />
@@ -99,14 +106,15 @@
         </el-table>
       </div>
     </div>
+    <!-- 操作按钮区域，用于归档、新建报表以及返回 -->
     <el-row align="middle" justify="center" style="height:60px" type="flex">
       <el-col :span="12">
-        <el-button size="small" type="primary" @click="archivingReportForm">归档{{
+        <el-button size="small" type="primary" @click="archivingReportForm"> 归档 {{
           yearVal ? yearVal.substr(4) : ''
-        }}报表
+        }} 报表
         </el-button>
-        <el-button size="small" type="primary" @click="createReportForm">新建报表</el-button>
-        <el-button size="small" @click="$router.back()">取消</el-button>
+        <el-button size="small" type="primary" @click="createReportForm"> 新建报表 </el-button>
+        <el-button size="small" @click="$router.back()"> 取消 </el-button>
       </el-col>
     </el-row>
   </div>
@@ -120,48 +128,89 @@ export default {
   name: 'HistoricalArchiving',
   data() {
     return {
-      num: 0,
-      yearVal: this.$route.query.yearMonth,
-      contentData: [],
-      loading: false
+      num: 0, // 初始化计数器
+      yearVal: this.$route.query.yearMonth, // 保存当前查询的年月
+      contentData: [], // 存储归档内容数据
+      loading: false // 控制加载状态
     }
   },
   created() {
     this.getArchivingCont()
   },
   methods: {
+    /**
+     * 异步加载归档内容。
+     *
+     * 此函数用于从服务器获取指定月份的归档内容。它首先设置加载状态为 true，然后发起一个异步请求，
+     * 请求参数包括月份（yearVal）和操作类型（1）。请求完成后，更新加载状态为 false，并用返回的数据
+     * 更新内容数据。
+     *
+     * @returns {void} 无返回值，但通过更新 this.contentData 来呈现加载的数据。
+     */
     async getArchivingCont() {
+      // 设置加载状态为 true，显示加载中...
       this.loading = true
+      // 发起异步请求获取归档内容
       this.contentData = await getArchivingCont({ month: this.yearVal, opType: 1 })
+      // 请求完成后，设置加载状态为 false，隐藏加载中...
       this.loading = false
     },
-    // 归档报表
+    /**
+     * 触发归档报表的函数
+     *
+     * 此函数用于在用户确认后归档指定年的报表。它首先通过弹出对话框确认操作，
+     * 如果用户同意，则调用归档函数。此操作不可逆，因为归档将覆盖之前的归档记录。
+     *
+     * @returns {void} 无返回值
+     */
     archivingReportForm() {
-      this.$confirm(`您确定要归档${this.yearVal}报表？报表归档将覆盖上一次归档记录，无法恢复。`).then(async() => {
+      // 显示确认对话框，提醒用户报表归档将覆盖之前的归档且无法恢复
+      this.$confirm(` 您确定要归档 ${this.yearVal} 报表？报表归档将覆盖上一次归档记录，无法恢复。`).then(async() => {
+        // 调用归档接口，传入年份作为参数
         await getArchivingArchive({ yearMonth: this.yearVal })
+        // 归档成功后，显示成功消息
         this.$message({
           type: 'success',
           message: '确定!'
         })
       })
     },
-    // 新建报表
+    /**
+     * 触发创建新报表的函数
+     * 此函数用于在用户确认后创建一个新的月份报表。它首先计算出下一个月的年份和月份，
+     * 然后通过对话框确认操作。如果用户确认，它将设置当前的年月，创建新报告，并获取存档内容。
+     * 这个函数假设 getNextMonth 函数已经被定义，并且返回下一个月份的年月字符串。
+     */
     createReportForm() {
+      // 获取下一个月的年月字符串
       const yearMonth = this.getNextMonth()
+      // 提取年份和月份
       const year = yearMonth.substring(0, 4)
       const month = yearMonth.substring(4)
+      // 显示确认对话框，确认创建当前年月的报表
       this.$confirm(
         '您将创建 《 ' + year + '年' + month + '月 》 报表'
       ).then(() => {
+        // 设置当前年月
         this.yearMonth = yearMonth
+        // 创建新报告
         this.createNewReport(yearMonth)
+        // 获取存档内容
         this.getArchivingCont()
       })
     },
+    /**
+     * 创建新报表的异步请求函数
+     * @param {string} yearMonth - 报表的年月
+     */
     async createNewReport(yearMonth) {
       await newReport({ yearMonth })
       this.$message.success('操作成功')
     },
+    /**
+     * 计算下一个月的年月
+     * @returns {string} 下一个月的年月字符串
+     */
     getNextMonth() {
       const year = this.yearVal.substring(0, 4)
       const month = this.yearVal.slice(4)
@@ -180,6 +229,7 @@ export default {
   }
 }
 </script>
+
 <style lang="scss" rel="stylesheet/scss" scoped>
 @import './../../styles/variables.scss';
 

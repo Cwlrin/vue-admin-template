@@ -1,8 +1,10 @@
 <template>
   <div class="securitySetting">
+    <!-- 设置列表 -->
     <div class="settingList">
+      <!-- 请假设置 -->
       <div class="set">
-        <span>请假</span>
+        <span> 请假 </span>
         <span>
           <el-switch
             v-model="levelData.enable"
@@ -13,8 +15,9 @@
         </span>
         <i class="el-icon-setting" @click="setFlow('regular')" />
       </div>
+      <!-- 加班设置 -->
       <div class="set">
-        <span>加班</span>
+        <span> 加班 </span>
         <span>
           <el-switch
             v-model="overtimeData.enable"
@@ -25,8 +28,9 @@
         </span>
         <i class="el-icon-setting" @click="setFlow('regular')" />
       </div>
+      <!-- 离职设置 -->
       <div class="set">
-        <span>离职</span>
+        <span> 离职 </span>
         <span>
           <el-switch
             v-model="dimissionData.enable"
@@ -38,6 +42,7 @@
         <i class="el-icon-setting" @click="setFlow('regular')" />
       </div>
     </div>
+    <!-- 弹窗用于上传流程配置文件 -->
     <el-dialog :visible.sync="dialogVisible" title="提示" width="30%">
       <span style="text-align:center">
         <el-upload
@@ -52,12 +57,12 @@
           drag
         >
           <i class="el-icon-upload" />
-          <div class="el-upload__text">将文件拖到此处</div>
+          <div class="el-upload__text"> 将文件拖到此处 </div>
         </el-upload>
       </span>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button @click="dialogVisible = false"> 取 消 </el-button>
+        <el-button type="primary" @click="dialogVisible = false"> 确 定 </el-button>
       </span>
     </el-dialog>
   </div>
@@ -71,6 +76,10 @@ import {
 } from '@/api/approval'
 import { getToken } from '@/utils/auth'
 
+/**
+ * 安全设置组件
+ * 用于配置请假、加班、离职等审批流程的启用状态，并提供上传流程配置文件的功能。
+ */
 export default {
   name: 'UsersTableIndex',
   components: {},
@@ -96,7 +105,11 @@ export default {
     }
   },
   computed: {
-    myheader: function() {
+    /**
+     * 获取 Authorization 头信息
+     * @returns {Object} 头信息
+     */
+    myheader() {
       return {
         Authorization: `Bearer ${getToken()}`
       }
@@ -106,6 +119,9 @@ export default {
     this.getFlowList()
   },
   methods: {
+    /**
+     * 获取流程列表并根据列表状态设置启用开关
+     */
     async getFlowList() {
       const data = await getFlowList()
       data.map(item => {
@@ -122,6 +138,11 @@ export default {
         }
       })
     },
+    /**
+     * 处理开关变化事件
+     * @param {Object} obj 数据对象
+     * @param {Event} e 事件对象
+     */
     handleChange(obj, e) {
       if (!obj.key) {
         this.$message.error('还未上传流程')
@@ -133,27 +154,54 @@ export default {
       }
       suspend(parent)
     },
+    /**
+     * 保存设置
+     */
     async changeSet() {
       await saveSetState(this.requestData)
       this.$message.success('设置保存成功！')
     },
+    /**
+     * 打开上传流程配置文件的弹窗
+     * @param {string} obj 流程类型
+     */
     setFlow(obj) {
       this.dialogVisible = true
     },
-    // 文件上传完成
+    /**
+     * 当文件上传操作完成时显示错误信息。
+     *
+     * @param {Object} obj - 包含错误信息的对象。
+     * @returns {void}
+     */
     typeTip(obj) {
       this.$message.error(obj)
     },
+    /**
+     * 文件上传前的钩子
+     * @param {File} file 上传的文件
+     * @param {Object} obj 数据对象
+     */
     beforeUpload(file, obj) {
       // importFilexml(file, obj, this.typeTip)
     },
-    // 上传错误
+    /**
+     * 文件上传失败的处理函数
+     * @param {Error} err 错误信息
+     * @param {File} file 上传的文件
+     * @param {Array} fileList 文件列表
+     */
     uploadFail(err, file, fileList) {
       this.uploadTip = '点击上传'
       this.processing = false
       this.$message.error(err)
     },
-    // 上传成功
+    /**
+     * 文件上传成功的处理函数
+     * @param {Object} obj 返回的结果
+     * @param {File} file 上传的文件
+     * @param {Array} fileList 文件列表
+     */
     handleFileSuccess(obj, file, fileList) {
       this.uploadTip = '点击上传'
       this.processing = false
@@ -215,3 +263,4 @@ $inactive: #ccc;
   }
 }
 </style>
+

@@ -1,13 +1,14 @@
 import Vue from 'vue'
-import SvgIcon from '@/components/SvgIcon'// svg component
+import SvgIcon from '@/components/SvgIcon' // 引入 SvgIcon 组件
 
-// register globally
+// 全局注册 SvgIcon 组件
 Vue.component('svg-icon', SvgIcon)
 
-// 下面三行代码的任务是 把 同级目录的 svg目录下的.svg图片引入到项目中来
+// 使用 require.context 动态加载 svg 图标
+// require.context 函数用于创建一个上下文，可以动态地加载指定目录下的所有模块
 const req = require.context('./svg', false, /\.svg$/)
+
+// 调用 requireAll 函数加载所有 svg 图标
+// requireAll 函数的作用是遍历 req.keys() 返回的数组，逐个加载数组中的模块
 const requireAll = requireContext => requireContext.keys().map(requireContext)
 requireAll(req)
-
-// 相当于把svg下的所有的svg图片打包到了项目中
-// 如果想用svg图片 就在svg目录下去寻找就可以了

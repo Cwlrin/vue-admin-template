@@ -1,7 +1,9 @@
 <template>
   <div class="add-form">
+    <!-- 弹出窗口用于新增或编辑流程 -->
     <el-dialog :visible.sync="dialogFormVisible" title="转正审批">
       <el-form ref="dataForm" :model="formData" label-position="right" label-width="100px">
+        <!-- 选择流程类型 -->
         <el-form-item label="应用：" prop="processType">
           <el-select v-model="formData.processType" class="filter-item" filterable>
             <el-option
@@ -12,6 +14,7 @@
             />
           </el-select>
         </el-form-item>
+        <!-- 节点列表，可新增、编辑节点 -->
         <el-form-item label="节点：">
           <p><strong />
             <el-button
@@ -50,7 +53,6 @@
         <el-button @click="dialogFormVisible = false">取消</el-button>
       </div>
     </el-dialog>
-
   </div>
 </template>
 
@@ -59,42 +61,45 @@ import { getManagerList } from '@/api/department'
 import { process } from '@/api/approvals'
 import commonApi from '@/api/constant/approvals'
 
+/**
+ * 设置页面，用于配置审批流程
+ */
 export default {
   name: 'Setting',
   props: ['setData'],
   data() {
     return {
-      dialogFormVisible: false,
+      dialogFormVisible: false, // 控制弹出窗口的可见性
       activeName: 'first',
       Data: [],
       formData: {
-        processType: '',
-        points: []
+        processType: '', // 流程类型
+        points: [] // 节点配置
       },
-      tempList: [],
-      baseData: commonApi
+      tempList: [], // 临时存储节点信息的列表
+      baseData: commonApi // 基础数据，包含审批类型等
     }
   },
-  // 创建完毕状态
-  created: function() {
+  created() {
+    // 初始化时获取员工列表
     this.getEmploySimple()
   },
   methods: {
-    // 业务方法
+    // 获取员工列表
     async getEmploySimple() {
-      this.Data = await getManagerList() // gaolyQQ需要提供该方法
+      this.Data = await getManagerList()
     },
-    // 弹层显示
+    // 弹出对话框
     dialogFormV() {
       this.dialogFormVisible = true
     },
-    // 弹层隐藏
+    // 关闭对话框
     dialogFormH() {
       this.dialogFormVisible = false
     },
-    // 界面交互
-    // 表单提交
+    // 保存配置
     saveBtn() {
+      // 将tempList中的节点信息转换为formData中的points格式
       for (var i = 0; i < this.tempList.length; i++) {
         var userData = this.tempList[i].user.join(',')
         var data = {
@@ -103,6 +108,7 @@ export default {
         }
         this.formData.points.push(data)
       }
+      // 提交流程配置
       process(this.formData)
         .then(() => {
           this.$message.success('流程添加成功！')
@@ -112,8 +118,9 @@ export default {
           this.$message.error('保存失败！')
         })
     },
-    // 新增一条模板数据
+    // 新增节点
     addTemp() {
+      // 当节点数量未达到上限时，新增节点
       if (this.tempList.length < 5) {
         this.tempList = this.tempList || []
         this.tempList.push({

@@ -1,12 +1,8 @@
 /**
- * Created by PanJiaChen on 16/11/18.
- */
-
-/**
- * Parse the time to string
- * @param {(Object|string|number)} time
- * @param {string} cFormat
- * @returns {string | null}
+ * 将时间转换为指定格式的字符串
+ * @param {(Object|string|number)} time - 需要转换的时间，可以是 Date 对象、时间戳字符串或时间戳数字
+ * @param {string} cFormat - 指定的时间格式字符串，默认为'{y}-{m}-{d} {h}:{i}:{s}'
+ * @returns {string|null} - 返回转换后的字符串，如果输入无效则返回 null
  */
 export function parseTime(time, cFormat) {
   if (arguments.length === 0 || !time) {
@@ -44,7 +40,7 @@ export function parseTime(time, cFormat) {
   }
   const time_str = format.replace(/{([ymdhisa])+}/g, (result, key) => {
     const value = formatObj[key]
-    // Note: getDay() returns 0 on Sunday
+    // ! getDay（）在周日返回 0
     if (key === 'a') {
       return ['日', '一', '二', '三', '四', '五', '六'][value]
     }
@@ -54,9 +50,10 @@ export function parseTime(time, cFormat) {
 }
 
 /**
- * @param {number} time
- * @param {string} option
- * @returns {string}
+ * 格式化时间
+ * @param {number} time - 时间戳
+ * @param {string} option - 时间格式选项
+ * @returns {string} - 格式化后的时间字符串
  */
 export function formatTime(time, option) {
   if (('' + time).length === 10) {
@@ -87,8 +84,9 @@ export function formatTime(time, option) {
 }
 
 /**
- * @param {string} url
- * @returns {Object}
+ * 将 URL 中的参数字符串转换为对象
+ * @param {string} url - 包含参数的 URL 字符串
+ * @returns {Object} - 包含参数名和参数值的对象
  */
 export function param2Obj(url) {
   const search = decodeURIComponent(url.split('?')[1]).replace(/\+/g, ' ')
@@ -109,7 +107,10 @@ export function param2Obj(url) {
 }
 
 /**
- * 列表型数据转化树形
+ * 将列表数据转换为树状数据结构
+ * @param {Array} list - 列表数据
+ * @param {number|string} rootValue - 根节点的值
+ * @returns {Array} - 转换后的树状数据
  */
 export function transListToTreeData(list, rootValue) {
   const arr = []
@@ -117,7 +118,7 @@ export function transListToTreeData(list, rootValue) {
     if (item.pid === rootValue) {
       // 找到了匹配的节点
       arr.push(item)
-      // 当前节点的id 和 当前节点的子节点的pid是想等的
+      // 当前节点的 id 和 当前节点的子节点的 pid 是想等的
       const children = transListToTreeData(list, item.id) // 找到的节点的子节点
       if (children.length) {
         item.children = children
